@@ -33,6 +33,37 @@
 					<Add option="lib-mingw-32\libglfw3.a -lgdi32 -lopengl32" />
 				</Linker>
 			</Target>
+			<Target title="Debug (CBlocks 17.12 32-bit)">
+				<Option output="bin/Debug/main" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Debug/" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-std=c++11" />
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add option="lib-mingw-32\libglfw3.a -lgdi32 -lopengl32" />
+				</Linker>
+			</Target>
+			<Target title="Release (CBlocks 17.12 32-bit)">
+				<Option output="bin/Release/main" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Release/" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-std=c++11" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="lib-mingw-32\libglfw3.a -lgdi32 -lopengl32" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />

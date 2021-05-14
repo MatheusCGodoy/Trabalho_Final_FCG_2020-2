@@ -298,6 +298,30 @@ int main(int argc, char* argv[])
     glm::mat4 the_model;
     glm::mat4 the_view;
 
+    //Coordenadas do ponto "l"
+    float lr = 2.5f;//g_CameraDistance;
+    float ly = 0;
+    float lz = 0;
+    float lx = 0;
+
+    //float r = g_CameraDistance;
+    float x = 1.0f;
+    float y = 1.0f;
+    float z = 0.0f;
+
+
+    // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
+    // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
+    glm::vec4 camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
+    glm::vec4 camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+    glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
+    glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+
+    //Medição do tempo a cada frame
+    float time_now = glfwGetTime();
+    float time_var = 0.0f;
+    float time_prev = 0.0f;
+
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
     {
@@ -323,17 +347,74 @@ int main(int argc, char* argv[])
         // variáveis g_CameraDistance, g_CameraPhi, e g_CameraTheta são
         // controladas pelo mouse do usuário. Veja as funções CursorPosCallback()
         // e ScrollCallback().
-        float r = g_CameraDistance;
-        float y = r*sin(g_CameraPhi);
-        float z = r*cos(g_CameraPhi)*cos(g_CameraTheta);
-        float x = r*cos(g_CameraPhi)*sin(g_CameraTheta);
+        //float r = g_CameraDistance;
+        //float y = r*sin(g_CameraPhi);
+        //float z = r*cos(g_CameraPhi)*cos(g_CameraTheta);
+        //float x = r*cos(g_CameraPhi)*sin(g_CameraTheta);
 
         // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
         // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
-        glm::vec4 camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
-        glm::vec4 camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-        glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
-        glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+        //glm::vec4 camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
+        //glm::vec4 camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+        //glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
+        //glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+
+
+        //Atualizar Coordenadas do vetor view
+        //lr = 2.5f; //g_CameraDistance;
+        ly = lr*sin(-g_CameraPhi);
+        lz = lr*cos(-g_CameraPhi)*cos(g_CameraTheta);
+        lx = lr*cos(-g_CameraPhi)*sin(g_CameraTheta);
+
+        camera_view_vector.x = lx;
+        camera_view_vector.y = ly;
+        camera_view_vector.z = lz;
+
+
+        //Vetores necessários para movimentar a câmera
+        //glm::vec4 w = -camera_view_vector/norm(camera_view_vector);
+        glm::vec4 w = -camera_view_vector;
+        glm::vec4 cp_UpW = crossproduct(camera_up_vector, w); //cross product de up e w que será usado abaixo
+        glm::vec4 u = cp_UpW;
+
+        // Normalizamos os vetores u e w
+        w = w / norm(w);
+        u = u / norm(u);
+
+        // Se utilizarmos o vetor w para mover a camera para frente e para trás
+        // a camera será movimentada na direção que ela está apontando, inclusive para cima
+        // e para baixo.
+        // Para permitir movimentos para frente e para trás sem alterar a altura da câmera:
+        glm::vec4 v = crossproduct(u, camera_up_vector); //vetor perpendicular a up e u
+
+        float speed = 0.5;
+        time_now = glfwGetTime();
+        time_var = time_now - time_prev;
+        time_prev = time_now;
+
+        //Movimentação da câmera:
+        // Se o usuário apertar a tecla W, mover a camera para frente (em direção ao vetor view)
+        if(glfwGetKey(window, GLFW_KEY_W))//bW_pressed)
+        {
+            camera_position_c += -v*speed*time_var;
+        }
+        // Se o usuário apertar a tecla S, mover a camera para trás (na direção oposta ao vetor view)
+        if(glfwGetKey(window, GLFW_KEY_S))
+        {
+            camera_position_c += v*speed*time_var;
+        }
+
+        // Se o usuário apertar a tecla A, mover a camera para a esquerda
+        if(glfwGetKey(window, GLFW_KEY_A))
+        {
+            camera_position_c += -u*speed*time_var;
+        }
+
+        // Se o usuário apertar a tecla D, mover a camera para a direita
+        if(glfwGetKey(window, GLFW_KEY_D))
+        {
+            camera_position_c += u*speed*time_var;
+        }
 
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
         // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
@@ -1033,18 +1114,19 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     }
 }
 
+
 // Função callback chamada sempre que o usuário movimentar o cursor do mouse em
 // cima da janela OpenGL.
 void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
     // Abaixo executamos o seguinte: caso o botão esquerdo do mouse esteja
-    // pressionado, computamos quanto que o mouse se movimento desde o último
+    // pressionado, computamos quanto que o mouse se movimentou desde o último
     // instante de tempo, e usamos esta movimentação para atualizar os
     // parâmetros que definem a posição da câmera dentro da cena virtual.
     // Assim, temos que o usuário consegue controlar a câmera.
 
-    if (g_LeftMouseButtonPressed)
-    {
+    //if (g_LeftMouseButtonPressed)
+    //{
         // Deslocamento do cursor do mouse em x e y de coordenadas de tela!
         float dx = xpos - g_LastCursorPosX;
         float dy = ypos - g_LastCursorPosY;
@@ -1067,7 +1149,7 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
         // cursor como sendo a última posição conhecida do cursor.
         g_LastCursorPosX = xpos;
         g_LastCursorPosY = ypos;
-    }
+    //}
 
     if (g_RightMouseButtonPressed)
     {

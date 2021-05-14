@@ -8,15 +8,20 @@
 		<Build>
 			<Target title="Debug">
 				<Option output="bin/Debug/TrabFinal_FCG" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Debug/" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
+				<Linker>
+					<Add option="lib-mingw-32\libglfw3.a -lgdi32 -lopengl32" />
+				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/TrabFinal_FCG" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Release/" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -25,11 +30,13 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="lib-mingw-32\libglfw3.a -lgdi32 -lopengl32" />
 				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-std=c++11" />
 			<Add directory="include" />
 		</Compiler>
 		<Linker>
@@ -40,6 +47,11 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/main.cpp" />
+		<Unit filename="src/shader_fragment.glsl" />
+		<Unit filename="src/shader_vertex.glsl" />
+		<Unit filename="src/stb_image.cpp" />
+		<Unit filename="src/textrendering.cpp" />
+		<Unit filename="src/tiny_obj_loader.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

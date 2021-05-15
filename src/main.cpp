@@ -101,7 +101,6 @@ void TextRendering_PrintMatrixVectorProductDivW(GLFWwindow* window, glm::mat4 M,
 // outras informações do programa. Definidas após main().
 void TextRendering_ShowModelViewProjection(GLFWwindow* window, glm::mat4 projection, glm::mat4 view, glm::mat4 model, glm::vec4 p_model);
 void TextRendering_ShowEulerAngles(GLFWwindow* window);
-void TextRendering_ShowProjection(GLFWwindow* window);
 void TextRendering_ShowFramesPerSecond(GLFWwindow* window);
 
 // Funções callback para comunicação com o sistema operacional e interação do
@@ -351,22 +350,6 @@ int main(int argc, char* argv[])
         // os shaders de vértice e fragmentos).
         glUseProgram(program_id);
 
-        // Computamos a posição da câmera utilizando coordenadas esféricas.  As
-        // variáveis g_CameraDistance, g_CameraPhi, e g_CameraTheta são
-        // controladas pelo mouse do usuário. Veja as funções CursorPosCallback()
-        // e ScrollCallback().
-        //float r = g_CameraDistance;
-        //float y = r*sin(g_CameraPhi);
-        //float z = r*cos(g_CameraPhi)*cos(g_CameraTheta);
-        //float x = r*cos(g_CameraPhi)*sin(g_CameraTheta);
-
-        // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
-        // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
-        //glm::vec4 camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
-        //glm::vec4 camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-        //glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
-        //glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
-
 
         //Atualizar Coordenadas do vetor view
         //lr = 2.5f; //g_CameraDistance;
@@ -460,26 +443,12 @@ int main(int argc, char* argv[])
         float nearplane = -0.1f;  // Posição do "near plane"
         float farplane  = -10.0f; // Posição do "far plane"
 
-        if (g_UsePerspectiveProjection)
-        {
-            // Projeção Perspectiva.
-            // Para definição do field of view (FOV), veja slides 205-215 do documento Aula_09_Projecoes.pdf.
-            float field_of_view = 3.141592 / 3.0f;
-            projection = Matrix_Perspective(field_of_view, g_ScreenRatio, nearplane, farplane);
-        }
-        else
-        {
-            // Projeção Ortográfica.
-            // Para definição dos valores l, r, b, t ("left", "right", "bottom", "top"),
-            // PARA PROJEÇÃO ORTOGRÁFICA veja slides 219-224 do documento Aula_09_Projecoes.pdf.
-            // Para simular um "zoom" ortográfico, computamos o valor de "t"
-            // utilizando a variável g_CameraDistance.
-            float t = 1.5f*g_CameraDistance/2.5f;
-            float b = -t;
-            float r = t*g_ScreenRatio;
-            float l = -r;
-            projection = Matrix_Orthographic(l, r, b, t, nearplane, farplane);
-        }
+
+        // Projeção Perspectiva.
+        // Para definição do field of view (FOV), veja slides 205-215 do documento Aula_09_Projecoes.pdf.
+        float field_of_view = 3.141592 / 3.0f;
+        projection = Matrix_Perspective(field_of_view, g_ScreenRatio, nearplane, farplane);
+
 
         glm::mat4 model = Matrix_Identity(); // Transformação identidade de modelagem
 
@@ -525,9 +494,6 @@ int main(int argc, char* argv[])
         // Imprimimos na tela os ângulos de Euler que controlam a rotação do
         // terceiro cubo.
         TextRendering_ShowEulerAngles(window);
-
-        // Imprimimos na informação sobre a matriz de projeção sendo utilizada.
-        TextRendering_ShowProjection(window);
 
         // Imprimimos na tela informação sobre o número de quadros renderizados
         // por segundo (frames per second).
@@ -1166,11 +1132,11 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
         float dx = xpos - g_LastCursorPosX;
         float dy = ypos - g_LastCursorPosY; //para inverter o movimento no eixo y
 
-        float sensibility = 0.01f;
+        float sensitivity = 0.005f; //0.01f;
 
         // Atualizamos parâmetros da câmera com os deslocamentos
-        g_CameraTheta -= dx * sensibility;
-        g_CameraPhi   += dy * sensibility;
+        g_CameraTheta -= dx * sensitivity;
+        g_CameraPhi   += dy * sensitivity;
 
         // Em coordenadas esféricas, o ângulo phi deve ficar entre -pi/2 e +pi/2.
         float phimax = 3.141592f/2;
@@ -1425,21 +1391,6 @@ void TextRendering_ShowEulerAngles(GLFWwindow* window)
     snprintf(buffer, 80, "Euler Angles rotation matrix = Z(%.2f)*Y(%.2f)*X(%.2f)\n", g_AngleZ, g_AngleY, g_AngleX);
 
     TextRendering_PrintString(window, buffer, -1.0f+pad/10, -1.0f+2*pad/10, 1.0f);
-}
-
-// Escrevemos na tela qual matriz de projeção está sendo utilizada.
-void TextRendering_ShowProjection(GLFWwindow* window)
-{
-    if ( !g_ShowInfoText )
-        return;
-
-    float lineheight = TextRendering_LineHeight(window);
-    float charwidth = TextRendering_CharWidth(window);
-
-    if ( g_UsePerspectiveProjection )
-        TextRendering_PrintString(window, "Perspective", 1.0f-13*charwidth, -1.0f+2*lineheight/10, 1.0f);
-    else
-        TextRendering_PrintString(window, "Orthographic", 1.0f-13*charwidth, -1.0f+2*lineheight/10, 1.0f);
 }
 
 // Escrevemos na tela o número de quadros renderizados por segundo (frames per

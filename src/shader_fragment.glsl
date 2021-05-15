@@ -67,13 +67,12 @@ void main()
 
     //Dados da "Spotlight" nesse caso lanterna
     vec4 p_light = camera_position; // posição da fonte de luz
-    vec4 vec_light = camera_view;; //sentido da fonte de luz
+    vec4 vec_light = camera_view; //sentido da fonte de luz
     float degrees_light = 0.5236; //30º em radianos
     bool not_under_light = dot(normalize(p - p_light), normalize(vec_light)) < cos(degrees_light); //um ponto p não é iluminado sse cos(b) < cos(a)
 
     // Vetor que define o sentido da fonte de luz (lanterna) em relação ao ponto atual.
     vec4 pFlashlight = normalize(p_light - p);  // Luz "sai" da camera em direção ao ponto p
-
 
     // Vetor que define o sentido da câmera em relação ao ponto atual.
     vec4 v = normalize(camera_position - p);
@@ -227,9 +226,12 @@ void main()
     // Termo especular utilizando o modelo de iluminação de Phong
     vec3 specular_flash  = Ks * Iflash * pow(max(0, dot(r_flash, v)), q); // PREENCH AQUI o termo especular de Phong
 
+    float dist_to_p = length(camera_position - p); // distancia da câmera até o ponto p
+    if(dist_to_p < 0.7f)
+        dist_to_p = 0.7f;
 
-    float lswitch = 1.0f;
-    float intensity = 1.0f;
+    float lswitch = 0.0f; // luz direcional está ligada ou não
+    float intensity = (10.0f/(dist_to_p*dist_to_p))*max(abs(dot(normalize(p - p_light), normalize(vec_light)) - cos(degrees_light)),0);//abs(dot(normalize(p - p_light), normalize(vec_light)) - cos(degrees_light)); //1.0f
 
     if(!is_flashlight_on)
         intensity = 0.0f;
@@ -241,7 +243,7 @@ void main()
     //color = Kd0 * (lambert + 0.01);
     // Cor final do fragmento calculada com uma combinação dos termos difuso,
     // especular, e ambiente. Veja slide 129 do documento Aula_17_e_18_Modelos_de_Iluminacao.pdf.
-    color = lswitch*(lambert_diffuse_term + phong_specular_term) + intensity*(diffuse_flash + specular_flash) + ambient_term;
+    color = lswitch*(lambert_diffuse_term + phong_specular_term + ambient_term) + intensity*(diffuse_flash + specular_flash);
 
     // Cor final com correção gamma, considerando monitor sRGB.
     // Veja https://en.wikipedia.org/w/index.php?title=Gamma_correction&oldid=751281772#Windows.2C_Mac.2C_sRGB_and_TV.2Fvideo_standard_gammas

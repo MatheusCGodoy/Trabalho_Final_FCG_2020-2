@@ -62,7 +62,13 @@ void main()
     vec4 n = normalize(normal);
 
     // Vetor que define o sentido da fonte de luz em relação ao ponto atual.
-    vec4 l = normalize(vec4(1.0,1.0,1.0,0.0));
+    //vec4 l = normalize(vec4(1.0,1.0,1.0,0.0));
+
+    // Fonte de luz pontual / lâmpada da sala
+    vec4 p_l = vec4(2.0f,1.6f,2.0f, 1.0f);//-1.5f,1.6f,2.0f,1.0f);
+
+    // Vetor que define o sentido da fonte de luz em relação ao ponto atual.
+    vec4 l = normalize(p_l - p);
 
 
     //Dados da "Spotlight" nesse caso lanterna
@@ -137,12 +143,12 @@ void main()
         i = abs(dot(n,l)); // como dot(n,l) pode ser negativo -> val absoluto
 
         //color = Kd0 * (lambert + 0.01); //orig
-        Kd = Kd1*((i - lambert) + 0.1) + Kd0*(lambert + 0.01);
+        //Kd = Kd1*((i - lambert) + 0.1) + Kd0*(lambert + 0.01);
 
         // Propriedades espectrais da esfera
-        //Kd = vec3(0.8,0.4,0.08);
+        Kd = vec3(1.0,1.0,1.0);
         Ks = vec3(0.0,0.0,0.0);
-        Ka = vec3(0.0,0.0,0.0);
+        Ka = vec3(1.0,1.0,1.0); //Como a esfera está sendo utilizada como representação da lâmpada
         q = 1.0;
 
     }
@@ -171,7 +177,7 @@ void main()
         V = (position_model.y - miny)/(maxy - miny);
 
         Kd = texture(TextureImage0, vec2(U,V)).rgb; */
-          Kd = vec3(0.8,0.4,0.08);
+        Kd = vec3(0.8,0.4,0.08);
         // Propriedades espectrais do coelho
         //Kd = vec3(0.08,0.4,0.8);
         Ks = vec3(0.8,0.8,0.8);
@@ -187,7 +193,7 @@ void main()
 
         // Propriedades espectrais do plano
         //Kd = texture(TextureImage0, vec2(U,V)).rgb;
-        Kd = vec3(0.0,0.5,1.00);
+        Kd = vec3(0.0,0.5,1.0);
         Ks = vec3(0.3,0.3,0.3);
         Ka = vec3(0.0,0.0,0.0);
         q = 60.0;
@@ -204,7 +210,7 @@ void main()
     vec3 Iflash = vec3(1.0f,1.0f,1.0f);
 
     // Espectro da fonte de iluminação
-    vec3 I = vec3(0.0f,0.0f,0.0f);
+    vec3 I = vec3(1.0f,1.0f,1.0f);
 
     // Espectro da luz ambiente
     vec3 Ia = vec3(0.5f,0.5f,0.5f);
@@ -243,6 +249,7 @@ void main()
     }
 
     //color = Kd0 * (lambert + 0.01);
+    //color = lambert_diffuse_term + ambient_term; // para testar sem iluminação especular
     // Cor final do fragmento calculada com uma combinação dos termos difuso,
     // especular, e ambiente. Veja slide 129 do documento Aula_17_e_18_Modelos_de_Iluminacao.pdf.
     color = lswitch*(lambert_diffuse_term + phong_specular_term + ambient_term) + intensity*(diffuse_flash + specular_flash);

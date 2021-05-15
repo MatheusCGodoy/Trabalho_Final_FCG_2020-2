@@ -281,7 +281,7 @@ int main(int argc, char* argv[])
     ObjModel planemodel("../../data/plane.obj");
     ComputeNormals(&planemodel);
     BuildTrianglesAndAddToVirtualScene(&planemodel);
-    
+
     ObjModel wallmodel("../../data/wall.obj");
     ComputeNormals(&wallmodel);
     BuildTrianglesAndAddToVirtualScene(&wallmodel);
@@ -318,8 +318,8 @@ int main(int argc, char* argv[])
 
     // Coordenadas da câmera
     //float r = g_CameraDistance;
-    float x = 1.0f;
-    float y = 1.0f;
+    float x = 0.9f;
+    float y = 0.6f; //1.0f;
     float z = 0.0f;
 
     // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
@@ -463,6 +463,7 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(view_uniform       , 1 , GL_FALSE , glm::value_ptr(view));
         glUniformMatrix4fv(projection_uniform , 1 , GL_FALSE , glm::value_ptr(projection));
 
+        #define SPHERE 0
         #define PLANE  2
 
         // Desenhamos o modelo da esfera
@@ -490,53 +491,53 @@ int main(int argc, char* argv[])
         model = Matrix_Translate(3.0f,1.5f,0.0f)  * Matrix_Rotate_Z(3.15) * Matrix_Scale(3.5f,0.0f,5.5f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, PLANE);
-        DrawVirtualObject("plane"); 
+        DrawVirtualObject("plane");
          */
         for (float j = 1.0; j <= 4; j++){
-            for (float i = 0.0; i < 3; i++ ){       
+            for (float i = 0.0; i < 3; i++ ){
                 model = Matrix_Translate(j,1.95f, i * 2.00) * Matrix_Rotate_Z(1.57) ;
                 glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(object_id_uniform, PLANE);
-                DrawVirtualObject("wall");  
+                DrawVirtualObject("wall");
             }
         }
 
         for (float j = 1.0; j <= 4; j++){
-            for (float i = 0.0; i < 3; i++ ){       
+            for (float i = 0.0; i < 3; i++ ){
                 model = Matrix_Translate(j,0.00f, i * 2.00) * Matrix_Rotate_Z(1.57) ;
                 glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
                 glUniform1i(object_id_uniform, PLANE);
-                DrawVirtualObject("wall");  
+                DrawVirtualObject("wall");
             }
         }
 
         model = Matrix_Translate(2.0f,1.95f, 0.00) * Matrix_Rotate_Z(1.57) ;
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(object_id_uniform, PLANE);
-            DrawVirtualObject("wall");  
+            DrawVirtualObject("wall");
 
         // Direita
-        for (float i = 0.0; i < 3; i++ ){       
+        for (float i = 0.0; i < 3; i++ ){
             model = Matrix_Translate(0.0f,0.0f,(i * 2.0)) * Matrix_Scale(1.0f,2.0f,1.0f);
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(object_id_uniform, PLANE);
-            DrawVirtualObject("wall");  
+            DrawVirtualObject("wall");
         }
 
         // Esquerda
-       for (float i = 0.0; i < 3; i++){       
+       for (float i = 0.0; i < 3; i++){
             model = Matrix_Translate(4.00f,0.0f,(i * 2.00))  * Matrix_Scale(1.0f,2.0f,1.0f);
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(object_id_uniform, PLANE);
-            DrawVirtualObject("wall");  
-        }  
+            DrawVirtualObject("wall");
+        }
 
         // Parte de Tras
         for (float i = 0.0; i < 2; i++){
             model = Matrix_Rotate_Y(29.85) * Matrix_Translate(5.0f,0.0f,-3.0f + (i * 2.00))  * Matrix_Scale(1.0f,2.0f,1.0f) ;
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(object_id_uniform, PLANE);
-            DrawVirtualObject("wall");  
+            DrawVirtualObject("wall");
         }
 
         // Parte da frente
@@ -544,9 +545,15 @@ int main(int argc, char* argv[])
             model = Matrix_Rotate_Y(29.85) * Matrix_Translate(-1.0f,0.0f,-3.0f + (i * 2.00))  * Matrix_Scale(1.0f,2.0f,1.0f) ;
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(object_id_uniform, PLANE);
-            DrawVirtualObject("wall");  
+            DrawVirtualObject("wall");
         }
 
+
+        model = Matrix_Translate(2.0f,1.8f,2.0f)
+              * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, SPHERE);
+        DrawVirtualObject("sphere");
 
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o

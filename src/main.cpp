@@ -147,6 +147,9 @@ bool g_LeftMouseButtonPressed = false;
 bool g_RightMouseButtonPressed = false; // Análogo para botão direito do mouse
 bool g_MiddleMouseButtonPressed = false; // Análogo para botão do meio do mouse
 
+// Se flashlight_on = true significa que a lanterna está ligada
+bool flashlight_on = false;
+
 // Variáveis que definem a câmera em coordenadas esféricas, controladas pelo
 // usuário através do mouse (veja função CursorPosCallback()). A posição
 // efetiva da câmera é calculada dentro da função main(), dentro do loop de
@@ -179,6 +182,8 @@ GLint projection_uniform;
 GLint object_id_uniform;
 GLint bbox_min_uniform;
 GLint bbox_max_uniform;
+GLint camera_view;
+GLint is_flashlight_on;
 
 // Número de texturas carregadas pela função LoadTextureImage()
 GLuint g_NumLoadedTextures = 0;
@@ -301,17 +306,17 @@ int main(int argc, char* argv[])
     glm::mat4 the_model;
     glm::mat4 the_view;
 
-    //Coordenadas do ponto "l"
+    // Coordenadas do ponto "l"
     float lr = 2.5f;//g_CameraDistance;
     float ly = 0;
     float lz = 0;
     float lx = 0;
 
+    // Coordenadas da câmera
     //float r = g_CameraDistance;
     float x = 1.0f;
     float y = 1.0f;
     float z = 0.0f;
-
 
     // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
     // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
@@ -322,7 +327,7 @@ int main(int argc, char* argv[])
 
     //Medição do tempo a cada frame
     float time_now = glfwGetTime();
-    float time_var = 0.0f;
+    float dt = 0.0f;
     float time_prev = 0.0f;
 
     // Ficamos em loop, renderizando, até que o usuário feche a janela
@@ -392,36 +397,60 @@ int main(int argc, char* argv[])
 
         float speed = 0.5;
         time_now = glfwGetTime();
-        time_var = time_now - time_prev;
+        dt = time_now - time_prev;
         time_prev = time_now;
 
         //Movimentação da câmera:
         // Se o usuário apertar a tecla W, mover a camera para frente (em direção ao vetor view)
         if(glfwGetKey(window, GLFW_KEY_W))//bW_pressed)
         {
-            camera_position_c += -v*speed*time_var;
+            camera_position_c += -v*speed*dt;
         }
         // Se o usuário apertar a tecla S, mover a camera para trás (na direção oposta ao vetor view)
         if(glfwGetKey(window, GLFW_KEY_S))
         {
-            camera_position_c += v*speed*time_var;
+            camera_position_c += v*speed*dt;
         }
 
         // Se o usuário apertar a tecla A, mover a camera para a esquerda
         if(glfwGetKey(window, GLFW_KEY_A))
         {
-            camera_position_c += -u*speed*time_var;
+            camera_position_c += -u*speed*dt;
         }
 
         // Se o usuário apertar a tecla D, mover a camera para a direita
         if(glfwGetKey(window, GLFW_KEY_D))
         {
-            camera_position_c += u*speed*time_var;
+            camera_position_c += u*speed*dt;
         }
 
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
         // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
         glm::mat4 view = Matrix_Camera_View(camera_position_c, camera_view_vector, camera_up_vector);
+
+        //####### Para a Lanterna ########
+        //envia o vetor view da camera para a placa de vídeo
+        glUniform4f(camera_view, camera_view_vector.x, camera_view_vector.y, camera_view_vector.z, 1.0f);
+
+        // Se o usuário apertar a tecla L, sinalizar que ligou a lanterna
+        /*if(glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+        {
+            if(flashlight_on){
+                glUniform1i(is_flashlight_on, false);
+                flashlight_on = false;
+            }
+            else{
+                glUniform1i(is_flashlight_on, true);
+                flashlight_on = true;
+            }
+        }*/
+
+        if(flashlight_on){
+            glUniform1i(is_flashlight_on, false);
+        }
+        else{
+            glUniform1i(is_flashlight_on, true);
+        }
 
         // Agora computamos a matriz de Projeção.
         glm::mat4 projection;
@@ -481,7 +510,7 @@ int main(int argc, char* argv[])
         DrawVirtualObject("bunny");
 
         // Desenhamos o plano do chão
-        model = Matrix_Translate(0.0f,1.1f,0.0f);
+        model = Matrix_Translate(0.0f,-1.1f,0.0f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, PLANE);
         DrawVirtualObject("plane");
@@ -653,6 +682,9 @@ void LoadShadersFromFiles()
     object_id_uniform       = glGetUniformLocation(program_id, "object_id"); // Variável "object_id" em shader_fragment.glsl
     bbox_min_uniform        = glGetUniformLocation(program_id, "bbox_min");
     bbox_max_uniform        = glGetUniformLocation(program_id, "bbox_max");
+    camera_view             = glGetUniformLocation(program_id, "camera_view");
+    is_flashlight_on        = glGetUniformLocation(program_id, "is_flashlight_on"); // Variável booleana em shader_fragment.glsl
+
 
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
     glUseProgram(program_id);
@@ -1132,7 +1164,7 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
     //{
         // Deslocamento do cursor do mouse em x e y de coordenadas de tela!
         float dx = xpos - g_LastCursorPosX;
-        float dy = ypos - g_LastCursorPosY;
+        float dy = ypos - g_LastCursorPosY; //para inverter o movimento no eixo y
 
         float sensibility = 0.01f;
 
@@ -1282,6 +1314,17 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         LoadShadersFromFiles();
         fprintf(stdout,"Shaders recarregados!\n");
         fflush(stdout);
+    }
+
+    // Se o usuário apertar a tecla L, sinalizar que ligou a lanterna
+    if(key == GLFW_KEY_L && action == GLFW_PRESS)
+    {
+        if(flashlight_on){
+            flashlight_on = false;
+        }
+        else{
+            flashlight_on = true;
+        }
     }
 
     // Habilita ou desabilita o cursor do mouse

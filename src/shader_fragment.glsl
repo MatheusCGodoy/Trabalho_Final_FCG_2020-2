@@ -62,7 +62,7 @@ void main()
     vec4 n = normalize(normal);
 
     // Vetor que define o sentido da fonte de luz em relação ao ponto atual.
-    vec4 l = normalize(vec4(1.0,1.0,0.0,0.0));
+    vec4 l = normalize(vec4(1.0,1.0,1.0,0.0));
 
 
     //Dados da "Spotlight" nesse caso lanterna
@@ -157,7 +157,7 @@ void main()
         // 'h' no slides 158-160 do documento Aula_20_Mapeamento_de_Texturas.pdf.
         // Veja também a Questão 4 do Questionário 4 no Moodle.
 
-        float minx = bbox_min.x;
+        /* float minx = bbox_min.x;
         float maxx = bbox_max.x;
 
         float miny = bbox_min.y;
@@ -170,7 +170,8 @@ void main()
         U = (position_model.x - minx)/(maxx - minx);
         V = (position_model.y - miny)/(maxy - miny);
 
-        Kd = texture(TextureImage0, vec2(U,V)).rgb;
+        Kd = texture(TextureImage0, vec2(U,V)).rgb; */
+          Kd = vec3(0.8,0.4,0.08);
         // Propriedades espectrais do coelho
         //Kd = vec3(0.08,0.4,0.8);
         Ks = vec3(0.8,0.8,0.8);
@@ -185,10 +186,11 @@ void main()
         V = texcoords.y;
 
         // Propriedades espectrais do plano
-        Kd = texture(TextureImage0, vec2(U,V)).rgb;
+        //Kd = texture(TextureImage0, vec2(U,V)).rgb;
+        Kd = vec3(0.0,0.5,1.00);
         Ks = vec3(0.3,0.3,0.3);
         Ka = vec3(0.0,0.0,0.0);
-        q = 20.0;
+        q = 60.0;
     }
     else // Objeto desconhecido = preto
     {
@@ -202,10 +204,10 @@ void main()
     vec3 Iflash = vec3(1.0f,1.0f,1.0f);
 
     // Espectro da fonte de iluminação
-    vec3 I = vec3(1.0f,1.0f,1.0f);
+    vec3 I = vec3(0.0f,0.0f,0.0f);
 
     // Espectro da luz ambiente
-    vec3 Ia = vec3(0.2f,0.2f,0.2f);
+    vec3 Ia = vec3(0.5f,0.5f,0.5f);
 
     // Termo difuso utilizando a lei dos cossenos de Lambert
     //vec3 lambert_diffuse_term = vec3(0.0,0.0,0.0);

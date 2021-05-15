@@ -1283,6 +1283,22 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         fprintf(stdout,"Shaders recarregados!\n");
         fflush(stdout);
     }
+
+    // Habilita ou desabilita o cursor do mouse
+    // Quando desabilitado ele fica escondido e retorna ao centro da tela a cada frame
+    // Quando habilitado ele fica visível e pode ser movido para fora da janela
+    static bool mouse_hidden = true;
+    if (key == GLFW_KEY_F1 && action == GLFW_PRESS)
+    {
+        if(mouse_hidden){
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            mouse_hidden = false;
+        }
+        else{
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            mouse_hidden = true;
+        }
+    }
 }
 
 // Definimos o callback para impressão de erros da GLFW no terminal

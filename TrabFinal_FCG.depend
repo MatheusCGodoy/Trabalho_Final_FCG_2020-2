@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1621028768 source:c:\users\mathe\trabfinal_fcg\src\main.cpp
+1621039901 source:c:\users\mathe\trabfinal_fcg\src\main.cpp
 	<cmath>
 	<cstdio>
 	<cstdlib>
@@ -39,7 +39,7 @@
 	<inttypes.h>
 	<stdint.h>
 
-1603713706 c:\users\mathe\trabfinal_fcg\include\glfw\glfw3.h
+1600011606 c:\users\mathe\trabfinal_fcg\include\glfw\glfw3.h
 	<stddef.h>
 	<stdint.h>
 	<OpenGL/gl3.h>

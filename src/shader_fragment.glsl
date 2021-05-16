@@ -238,7 +238,7 @@ void main()
     if(dist_to_p < 0.7f)
         dist_to_p = 0.7f;
 
-    float lswitch = 0.0f; // luz direcional está ligada ou não
+    float lswitch = 1.0f; // luz direcional está ligada ou não
     float intensity = (10.0f/(dist_to_p*dist_to_p))*max(abs(dot(normalize(p - p_light), normalize(vec_light)) - cos(degrees_light)),0);//abs(dot(normalize(p - p_light), normalize(vec_light)) - cos(degrees_light)); //1.0f
 
     if(!is_flashlight_on)

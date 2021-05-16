@@ -321,8 +321,10 @@ int main(int argc, char* argv[])
     // Coordenadas da câmera
     //float r = g_CameraDistance;
     float x = 0.9f;
-    float y = 0.6f; //1.0f;
+    float y = 1.0f; //1.0f;
     float z = 0.0f;
+
+    bool on_ground = true;
 
     // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
     // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
@@ -330,6 +332,12 @@ int main(int argc, char* argv[])
     glm::vec4 camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
     glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
     glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+
+    // Vetor de gravidade:
+    glm::vec4 gravity_vec = glm::vec4(0.0f,-0.1f,0.0f,0.0f);
+
+    // Vetor de pulo:
+    glm::vec4 jump_vec = glm::vec4(0.0f,0.3f,0.0f,0.0f);
 
     //Medição do tempo a cada frame
     float time_now = glfwGetTime();
@@ -430,6 +438,27 @@ int main(int argc, char* argv[])
             }
         }
 
+        // Se o usuário apertar a tecla ESPAÇO enquanto ele estiver no chão, definir vetor de pulo
+        if(glfwGetKey(window, GLFW_KEY_SPACE) && on_ground)
+        {
+            // Vetor de pulo:
+            jump_vec = glm::vec4(0.0f,0.3f,0.0f,0.0f);//20.0f * ((camera_up_vector + v)/norm(camera_up_vector + v));
+
+            on_ground = false;
+            //camera_position_c += jump_vec*speed*dt;
+        }
+
+        if(camera_position_c.y <= 0.6){
+            on_ground = true;
+            camera_position_c.y = 0.6;
+        }
+
+        // Se o personagem estiver caindo...
+        if(!on_ground){
+            camera_position_c += jump_vec * dt * speed;
+            jump_vec = jump_vec + speed * dt * gravity_vec;
+        }
+
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
         // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
         glm::mat4 view = Matrix_Camera_View(camera_position_c, camera_view_vector, camera_up_vector);
@@ -438,19 +467,7 @@ int main(int argc, char* argv[])
         //envia o vetor view da camera para a placa de vídeo
         glUniform4f(camera_view, camera_view_vector.x, camera_view_vector.y, camera_view_vector.z, 1.0f);
 
-        // Se o usuário apertar a tecla L, sinalizar que ligou a lanterna
-        /*if(glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
-        {
-            if(flashlight_on){
-                glUniform1i(is_flashlight_on, false);
-                flashlight_on = false;
-            }
-            else{
-                glUniform1i(is_flashlight_on, true);
-                flashlight_on = true;
-            }
-        }*/
-
+        // Se o usuário apertar a tecla L, flashlight_on = true, ou seja, ligou a lanterna
         if(flashlight_on){
             glUniform1i(is_flashlight_on, false);
         }
@@ -464,7 +481,7 @@ int main(int argc, char* argv[])
         // Note que, no sistema de coordenadas da câmera, os planos near e far
         // estão no sentido negativo! Veja slides 176-204 do documento Aula_09_Projecoes.pdf.
         float nearplane = -0.1f;  // Posição do "near plane"
-        float farplane  = -10.0f; // Posição do "far plane"
+        float farplane  = -50.0f; //-10.0f; // Posição do "far plane"
 
 
         // Projeção Perspectiva.

@@ -332,10 +332,10 @@ int main(int argc, char* argv[])
     glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
 
     // Vetor de gravidade:
-    glm::vec4 gravity_vec = glm::vec4(0.0f,-0.1f,0.0f,0.0f);
+    glm::vec4 gravity_vec = glm::vec4(0.0f,-0.3f,0.0f,0.0f);
 
     // Vetor de pulo:
-    glm::vec4 jump_vec = glm::vec4(0.0f,0.3f,0.0f,0.0f);
+    glm::vec4 jump_vec = glm::vec4(0.0f,0.7f,0.0f,0.0f);
 
     //Medição do tempo a cada frame
     float time_now = glfwGetTime();
@@ -424,12 +424,13 @@ int main(int argc, char* argv[])
         if(glfwGetKey(window, GLFW_KEY_SPACE) && on_ground)
         {
             // Vetor de pulo:
-            jump_vec = glm::vec4(0.0f,0.3f,0.0f,0.0f);//20.0f * ((camera_up_vector + v)/norm(camera_up_vector + v));
+            jump_vec = glm::vec4(0.0f,0.7f,0.0f,0.0f);//glm::vec4(0.0f,0.3f,0.0f,0.0f);
 
             on_ground = false;
             //camera_position_c += jump_vec*speed*dt;
         }
 
+        // Testa se o personagem já chegou no chão ou caiu para baixo do chão
         if(camera_position_c.y <= 0.6){
             on_ground = true;
             camera_position_c.y = 0.6;

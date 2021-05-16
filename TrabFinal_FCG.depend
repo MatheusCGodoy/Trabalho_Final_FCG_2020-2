@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1621127977 source:c:\users\mathe\trabfinal_fcg\src\main.cpp
+1621134008 source:c:\users\mathe\trabfinal_fcg\src\main.cpp
 	<cmath>
 	<cstdio>
 	<cstdlib>
@@ -8,6 +8,7 @@
 	<string>
 	<vector>
 	<limits>
+	<iostream>
 	<fstream>
 	<sstream>
 	<stdexcept>

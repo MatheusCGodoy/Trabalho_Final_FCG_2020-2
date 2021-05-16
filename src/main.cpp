@@ -17,6 +17,7 @@
 #include <string>
 #include <vector>
 #include <limits>
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -321,7 +322,7 @@ int main(int argc, char* argv[])
     // Coordenadas da câmera
     //float r = g_CameraDistance;
     float x = 0.9f;
-    float y = 1.0f; //1.0f;
+    float y = 0.6f; //1.0f;
     float z = 0.0f;
 
     bool on_ground = true;
@@ -399,6 +400,7 @@ int main(int argc, char* argv[])
         time_prev = time_now;
 
         glm::vec4 newx_position;
+        float aux = 0;
 
         //Movimentação da câmera:
         // Se o usuário apertar a tecla W, mover a camera para frente (em direção ao vetor view)
@@ -407,34 +409,122 @@ int main(int argc, char* argv[])
 
             newx_position = camera_position_c -v*speed*dt;
             if (ValidatePosition(newx_position) == 1) {
-                camera_position_c += -v*speed*dt;
+                camera_position_c = newx_position;
+            }
+            switch(ValidatePosition(newx_position)){
+            case -1:
+                aux = v.x;
+                v.x = 0.0f;
+                newx_position = camera_position_c -v*speed*dt; //movimento sem alterar o X
+                v.x = aux;
+
+                if (ValidatePosition(newx_position) == 1) {
+                    camera_position_c = newx_position;
+                }
+                break;
+            case -2:
+                aux = v.z;
+                v.z = 0.0f;
+                newx_position = camera_position_c -v*speed*dt; //movimento sem alterar o Z
+                v.z = aux;
+
+                if (ValidatePosition(newx_position) == 1) {
+                    camera_position_c = newx_position;
+                }
+                break;
             }
         }
         // Se o usuário apertar a tecla S, mover a camera para trás (na direção oposta ao vetor view)
         if(glfwGetKey(window, GLFW_KEY_S))
-        {   
+        {
             newx_position = camera_position_c + v*speed*dt;
             if (ValidatePosition(newx_position) == 1) {
-                camera_position_c += v*speed*dt;
+                camera_position_c = newx_position;
+            }
+            switch(ValidatePosition(newx_position)){
+            case -1:
+                aux = v.x;
+                v.x = 0.0f;
+                newx_position = camera_position_c + v*speed*dt; //movimento sem alterar o X
+                v.x = aux;
+
+                if (ValidatePosition(newx_position) == 1) {
+                    camera_position_c = newx_position;
+                }
+                break;
+            case -2:
+                aux = v.z;
+                v.z = 0.0f;
+                newx_position = camera_position_c + v*speed*dt; //movimento sem alterar o Z
+                v.z = aux;
+
+                if (ValidatePosition(newx_position) == 1) {
+                    camera_position_c = newx_position;
+                }
+                break;
             }
 
         }
 
         // Se o usuário apertar a tecla A, mover a camera para a esquerda
         if(glfwGetKey(window, GLFW_KEY_A))
-        {   
+        {
             newx_position = camera_position_c -u*speed*dt;
             if (ValidatePosition(newx_position) == 1) {
                 camera_position_c += -u*speed*dt;
+            }
+            switch(ValidatePosition(newx_position)){
+            case -1:
+                aux = u.x;
+                u.x = 0.0f;
+                newx_position = camera_position_c -u*speed*dt; //movimento sem alterar o X
+                u.x = aux;
+
+                if (ValidatePosition(newx_position) == 1) {
+                    camera_position_c = newx_position;
+                }
+                break;
+            case -2:
+                aux = u.z;
+                u.z = 0.0f;
+                newx_position = camera_position_c -u*speed*dt; //movimento sem alterar o Z
+                u.z = aux;
+
+                if (ValidatePosition(newx_position) == 1) {
+                    camera_position_c = newx_position;
+                }
+                break;
             }
         }
 
         // Se o usuário apertar a tecla D, mover a camera para a direita
         if(glfwGetKey(window, GLFW_KEY_D))
-        {   
+        {
             newx_position = camera_position_c  + u*speed*dt;
             if (ValidatePosition(newx_position) == 1) {
                 camera_position_c += u*speed*dt;
+            }
+            switch(ValidatePosition(newx_position)){
+            case -1:
+                aux = u.x;
+                u.x = 0.0f;
+                newx_position = camera_position_c + u*speed*dt; //movimento sem alterar o X
+                u.x = aux;
+
+                if (ValidatePosition(newx_position) == 1) {
+                    camera_position_c = newx_position;
+                }
+                break;
+            case -2:
+                aux = u.z;
+                u.z = 0.0f;
+                newx_position = camera_position_c + u*speed*dt; //movimento sem alterar o Z
+                u.z = aux;
+
+                if (ValidatePosition(newx_position) == 1) {
+                    camera_position_c = newx_position;
+                }
+                break;
             }
         }
 
@@ -443,13 +533,12 @@ int main(int argc, char* argv[])
         {
             // Vetor de pulo:
             jump_vec = glm::vec4(0.0f,0.7f,0.0f,0.0f);//glm::vec4(0.0f,0.3f,0.0f,0.0f);
-
+            //Sinaliza que o personagem está pulando / no ar
             on_ground = false;
-            //camera_position_c += jump_vec*speed*dt;
         }
 
         // Testa se o personagem já chegou no chão ou caiu para baixo do chão
-        if(camera_position_c.y <= 0.6){
+        if(camera_position_c.y <= 0.6 && (!on_ground)){
             on_ground = true;
             camera_position_c.y = 0.6;
         }
@@ -654,11 +743,18 @@ void LoadTextureImage(const char* filename)
 }
 
 int ValidatePosition(glm::vec4 position) {
-    printf("Posiao x %f   ", position.x);
-    printf("Posiao y %f   ", position.y);
-    printf("Posiao z %f\n", position.z);
+    //printf("Posiao x %f   ", position.x);
+    //printf("Posiao y %f   ", position.y);
+    //printf("Posiao z %f\n", position.z);
+    //std::cout << "Posiao x " << position.x << "   ";
+    //std::cout << "Posiao y " << position.y << "   ";
+    //std::cout << "Posiao z " << position.z << std::endl;
 
-    if (position.x > 3.80 || position.x < 0.15 || position.z > 4.80 || position.z < -0.80) return 0;
+    //if (position.x > 3.80 || position.x < 0.15 || position.z > 4.80 || position.z < -0.80) return 0;
+    if (position.x > 3.70 || position.x < 0.25)
+        return -1;
+    else if (position.z > 4.70 || position.z < -0.70)
+        return -2;
 
     return 1;
 }

@@ -112,6 +112,8 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
+int ValidatePosition(glm::vec4 position);
+
 // Definimos uma estrutura que armazenará dados necessários para renderizar
 // cada objeto da cena virtual.
 struct SceneObject
@@ -388,28 +390,44 @@ int main(int argc, char* argv[])
         dt = time_now - time_prev;
         time_prev = time_now;
 
+        glm::vec4 newx_position;
+
         //Movimentação da câmera:
         // Se o usuário apertar a tecla W, mover a camera para frente (em direção ao vetor view)
         if(glfwGetKey(window, GLFW_KEY_W))//bW_pressed)
         {
-            camera_position_c += -v*speed*dt;
+
+            newx_position = camera_position_c -v*speed*dt;
+            if (ValidatePosition(newx_position) == 1) {
+                camera_position_c += -v*speed*dt;
+            }
         }
         // Se o usuário apertar a tecla S, mover a camera para trás (na direção oposta ao vetor view)
         if(glfwGetKey(window, GLFW_KEY_S))
-        {
-            camera_position_c += v*speed*dt;
+        {   
+            newx_position = camera_position_c + v*speed*dt;
+            if (ValidatePosition(newx_position) == 1) {
+                camera_position_c += v*speed*dt;
+            }
+
         }
 
         // Se o usuário apertar a tecla A, mover a camera para a esquerda
         if(glfwGetKey(window, GLFW_KEY_A))
-        {
-            camera_position_c += -u*speed*dt;
+        {   
+            newx_position = camera_position_c -u*speed*dt;
+            if (ValidatePosition(newx_position) == 1) {
+                camera_position_c += -u*speed*dt;
+            }
         }
 
         // Se o usuário apertar a tecla D, mover a camera para a direita
         if(glfwGetKey(window, GLFW_KEY_D))
-        {
-            camera_position_c += u*speed*dt;
+        {   
+            newx_position = camera_position_c  + u*speed*dt;
+            if (ValidatePosition(newx_position) == 1) {
+                camera_position_c += u*speed*dt;
+            }
         }
 
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
@@ -466,33 +484,7 @@ int main(int argc, char* argv[])
         #define SPHERE 0
         #define PLANE  2
 
-        // Desenhamos o modelo da esfera
-/*         model = Matrix_Translate(-1.0f,0.0f,0.0f)
-              * Matrix_Rotate_Z(0.6f)
-              * Matrix_Rotate_X(0.2f)
-              * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.1f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, SPHERE);
-        DrawVirtualObject("sphere");
 
-        // Desenhamos o modelo do coelho
-        model = Matrix_Translate(1.0f,0.0f,0.0f)
-              * Matrix_Rotate_X(g_AngleX + (float)glfwGetTime() * 0.1f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, BUNNY);
-        DrawVirtualObject("bunny");*/
-
-        // Desenhamos o plano do chão
-/*         model = Matrix_Translate(3.0f,0.0,0.0f) * Matrix_Scale(3.5f,0.0f,5.5f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE);
-        DrawVirtualObject("plane");
-
-        model = Matrix_Translate(3.0f,1.5f,0.0f)  * Matrix_Rotate_Z(3.15) * Matrix_Scale(3.5f,0.0f,5.5f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE);
-        DrawVirtualObject("plane");
-         */
         for (float j = 1.0; j <= 4; j++){
             for (float i = 0.0; i < 3; i++ ){
                 model = Matrix_Translate(j,1.95f, i * 2.00) * Matrix_Rotate_Z(1.57) ;
@@ -516,7 +508,6 @@ int main(int argc, char* argv[])
             glUniform1i(object_id_uniform, PLANE);
             DrawVirtualObject("wall");
 
-        // Direita
         for (float i = 0.0; i < 3; i++ ){
             model = Matrix_Translate(0.0f,0.0f,(i * 2.0)) * Matrix_Scale(1.0f,2.0f,1.0f);
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
@@ -524,7 +515,7 @@ int main(int argc, char* argv[])
             DrawVirtualObject("wall");
         }
 
-        // Esquerda
+
        for (float i = 0.0; i < 3; i++){
             model = Matrix_Translate(4.00f,0.0f,(i * 2.00))  * Matrix_Scale(1.0f,2.0f,1.0f);
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
@@ -532,7 +523,7 @@ int main(int argc, char* argv[])
             DrawVirtualObject("wall");
         }
 
-        // Parte de Tras
+
         for (float i = 0.0; i < 2; i++){
             model = Matrix_Rotate_Y(29.85) * Matrix_Translate(5.0f,0.0f,-3.0f + (i * 2.00))  * Matrix_Scale(1.0f,2.0f,1.0f) ;
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
@@ -540,7 +531,6 @@ int main(int argc, char* argv[])
             DrawVirtualObject("wall");
         }
 
-        // Parte da frente
         for (float i = 0.0; i < 2; i++){
             model = Matrix_Rotate_Y(29.85) * Matrix_Translate(-1.0f,0.0f,-3.0f + (i * 2.00))  * Matrix_Scale(1.0f,2.0f,1.0f) ;
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
@@ -643,6 +633,16 @@ void LoadTextureImage(const char* filename)
     stbi_image_free(data);
 
     g_NumLoadedTextures += 1;
+}
+
+int ValidatePosition(glm::vec4 position) {
+    printf("Posiao x %f   ", position.x);
+    printf("Posiao y %f   ", position.y);
+    printf("Posiao z %f\n", position.z);
+
+    if (position.x > 3.80 || position.x < 0.15 || position.z > 4.80 || position.z < -0.80) return 0;
+
+    return 1;
 }
 
 // Função que desenha um objeto armazenado em g_VirtualScene. Veja definição

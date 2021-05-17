@@ -629,6 +629,13 @@ int main(int argc, char* argv[])
             DrawVirtualObject("wall");
         }
 
+        glm::mat4 inverseModel =  Matrix_Scale(1.0f/1.0f, 1.0f/2.0f, 1.0f/1.0f) * Matrix_Translate(-0.0f,-0.0f,-2.0f);
+        glm::vec4 vec_orig = camera_position_c * inverseModel;
+        glm::vec4 vec_end = (camera_position_c + (camera_view_vector*100.0f))* inverseModel;
+
+        if(LINE_collision(g_VirtualScene["wall"], vec_orig, vec_end))
+            std::cout << "Colisao com parede" << std::endl;
+
 
        for (float i = 0.0; i < 3; i++){
             model = Matrix_Translate(4.00f,0.0f,(i * 2.00))  * Matrix_Scale(1.0f,2.0f,1.0f);
@@ -659,9 +666,12 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, SPHERE);
         DrawVirtualObject("sphere");
 
-        glm::mat4 inverseModel =  Matrix_Scale(1/0.15f, 1/0.15f, 1/0.15f) * Matrix_Translate(-2.0f,-1.8f,-2.0f);
-        glm::vec4 vec_orig = camera_position_c * inverseModel;
-        glm::vec4 vec_end = (camera_position_c + (camera_view_vector*5.0f))* inverseModel;
+        //glm::mat4 inverseModel =  Matrix_Scale(1/0.15f, 1/0.15f, 1/0.15f) * Matrix_Translate(-2.0f,-1.8f,-2.0f);
+        //glm::vec4 vec_orig = camera_position_c * inverseModel;
+        //glm::vec4 vec_end = (camera_position_c + (camera_view_vector*5.0f))* inverseModel;
+        inverseModel =  Matrix_Scale(1.0f/0.15f, 1.0f/0.15f, 1.0f/0.15f) * Matrix_Translate(-2.0f,-1.8f,-2.0f);
+        vec_orig = camera_position_c * inverseModel;
+        vec_end = (camera_position_c + (camera_view_vector*100.0f))* inverseModel;
 
         if(LINE_collision(g_VirtualScene["sphere"], vec_orig, vec_end))
             std::cout << "Colisao com esfera" << std::endl;

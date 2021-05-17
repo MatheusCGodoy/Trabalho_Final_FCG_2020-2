@@ -24,12 +24,25 @@ bool BOX_collision(const SceneObject& A, const SceneObject& B){
 bool ClipLine(int dim, const SceneObject& A, const glm::vec4 vec_origin, const glm::vec4 vec_end, float& f_low, float& f_high){
     float f_dim_low, f_dim_high;
 
-    //equação implícita da reta
+    //printf("A.bbox_min[%d] = %f\n", dim, A.bbox_min[dim]);
+    //printf("A.bbox_max[%d] = %f\n", dim, A.bbox_max[dim]);
+
+    //printf("vec_origin[%d] = %f\n", dim, vec_origin[dim]);
+    //printf("vec_end[%d] = %f\n", dim, vec_end[dim]);
+
+    //equação implícita da reta: (p - a) / d  -> d => (b - a)
     f_dim_low = (A.bbox_min[dim] - vec_origin[dim]) / (vec_end[dim] - vec_origin[dim]);
     f_dim_high = (A.bbox_max[dim] - vec_origin[dim]) / (vec_end[dim] - vec_origin[dim]);
 
+    //printf("f_dim_Low = %f\n", f_dim_low);
+    //printf("f_dim_High = %f\n", f_dim_high);
+
     if(f_dim_high < f_dim_low)
         std::swap(f_dim_high, f_dim_low);
+
+    //printf("After swap:\n");
+    //printf("f_dim_Low = %f\n", f_dim_low);
+    //printf("f_dim_High = %f\n", f_dim_high);
 
     if(f_dim_high < f_low)
         return false;
@@ -43,6 +56,7 @@ bool ClipLine(int dim, const SceneObject& A, const glm::vec4 vec_origin, const g
     if(f_low > f_high)
         return false;
 
+    //printf("Returned true!!!!!!!!!!!\n");
     return true;
 }
 
@@ -52,11 +66,14 @@ bool LINE_collision(const SceneObject& A, const glm::vec4 vec_origin, const glm:
     float f_high = 0;
 
     for(int i = 0; i < 3; i++){
+        //printf("Loop %d\n", i);
         if(!ClipLine(i, A, vec_origin, vec_end, f_low, f_high))
             return false;
     }
 
     //glm::vec4 d = vec_end - vec_origin;
+
+    //int t = f_low;
 
     return true;
 

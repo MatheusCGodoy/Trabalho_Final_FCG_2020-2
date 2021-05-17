@@ -188,8 +188,8 @@ void main()
         //Kd = vec3(0.08,0.4,0.8);
         Ks = vec3(0.8,0.8,0.8);
         Ka = vec3(0.01,0.01,0.01);
-        q = 32.0;
-
+        //q = 32.0; //phong
+        q = 80; //blinn-phong
     }
     else if ( object_id == PLANE )
     {
@@ -202,7 +202,8 @@ void main()
         Kd = vec3(0.0,0.5,1.0);
         Ks = vec3(0.3,0.3,0.3);
         Ka = vec3(0.0,0.0,0.0);
-        q = 60.0;
+        //q = 60.0; //phong
+        q = 100.0f; //blinn-phong
     }
     else // Objeto desconhecido = preto
     {

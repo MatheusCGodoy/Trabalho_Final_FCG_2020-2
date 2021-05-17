@@ -167,6 +167,8 @@ bool g_MiddleMouseButtonPressed = false; // Análogo para botão do meio do mous
 // Se flashlight_on = true significa que a lanterna está ligada
 bool flashlight_on = false;
 
+bool flashlightambient_on = false;
+
 // Variáveis que definem a câmera em coordenadas esféricas, controladas pelo
 // usuário através do mouse (veja função CursorPosCallback()). A posição
 // efetiva da câmera é calculada dentro da função main(), dentro do loop de
@@ -201,6 +203,7 @@ GLint bbox_min_uniform;
 GLint bbox_max_uniform;
 GLint camera_view;
 GLint is_flashlight_on;
+GLint is_flashlightambient_on;
 
 // Número de texturas carregadas pela função LoadTextureImage()
 GLuint g_NumLoadedTextures = 0;
@@ -663,6 +666,14 @@ int main(int argc, char* argv[])
             glUniform1i(is_flashlight_on, true);
         }
 
+        if(flashlightambient_on){
+            glUniform1i(is_flashlightambient_on, false);
+        }
+        else{
+            glUniform1i(is_flashlightambient_on, true);
+        }
+
+
         // Agora computamos a matriz de Projeção.
         glm::mat4 projection;
 
@@ -748,9 +759,9 @@ int main(int argc, char* argv[])
         model = Matrix_Translate(2.0f,1.8f,2.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
         RederingObj(&spheremodel, model, SPHERE);
 
-        // Lightswitch
-        model = Matrix_Translate(1.0f,1.0f,3.0f) * Matrix_Rotate_Y(3.15) * Matrix_Translate(-1.0f,0.0f,-1.95f) * Matrix_Scale(0.03f,0.03f,0.03f);
-        RederingObj(&light_switchmodel, model, LIGTHSWITCH);
+        // Display
+        model = Matrix_Translate(0.9f,0.5f,4.95f) * Matrix_Scale(0.2f,0.2f,0.2f);
+        RederingObj(&displaymodel, model, DEFAULT);
 
         //glm::mat4 inverseModel =  Matrix_Scale(1/0.15f, 1/0.15f, 1/0.15f) * Matrix_Translate(-2.0f,-1.8f,-2.0f);
         //glm::vec4 vec_orig = camera_position_c * inverseModel;
@@ -768,6 +779,14 @@ int main(int argc, char* argv[])
 
         // Ponto de seleção - usado para pegar os objetos - teste de intersecção
         select_point = camera_position_c + (camera_view_vector*0.2f);
+
+        if (select_point.x == 1.0,select_point.y == 1.0, select_point.z == 3.0){
+            printf("asdwad");
+        }
+
+        // Lightswitch
+        model = Matrix_Translate(1.0f,1.0f,3.0f) * Matrix_Rotate_Y(3.15) * Matrix_Translate(-1.0f,0.0f,-1.95f) * Matrix_Scale(0.03f,0.03f,0.03f);
+        RederingObj(&light_switchmodel, model, LIGTHSWITCH);
 
         // Testa se está segurando o coelho
         if(g_VirtualScene["bunny"].picked_up && glfwGetKey(window, GLFW_KEY_E)){
@@ -791,11 +810,9 @@ int main(int argc, char* argv[])
         }
         else{
             model_bunny = Matrix_Translate(2.0f,0.2f,2.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
-        }
+        }    
 
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-
-        RederingObj(&boxmodel, model_bunny, BOX);
+        RederingObj(&bunnymodel, model_bunny, BUNNY);
 
         //if(LINE_collision(g_VirtualScene["bunny"], p_orig, p_end, model))
             //std::cout << "Colisao com coelho " << glfwGetTime() << std::endl;
@@ -812,6 +829,8 @@ int main(int argc, char* argv[])
         // Testa se está segurando a caixa
         if(g_VirtualScene["box"].picked_up && glfwGetKey(window, GLFW_KEY_E)){
             g_VirtualScene["box"].picked_up = false;
+            g_VirtualScene["box"].AngleX = 0.0f;
+            g_VirtualScene["box"].AngleY = 0.0f;
         }
 
         if(g_VirtualScene["box"].picked_up){
@@ -819,18 +838,19 @@ int main(int argc, char* argv[])
             g_VirtualScene["box"].CoordY = select_point.y;
             g_VirtualScene["box"].CoordZ = select_point.z;
 
-            model_box = Matrix_Translate(select_point.x,select_point.y,select_point.z) * Matrix_Scale(0.2f,0.2f,0.2f);
+            model_box = Matrix_Translate(select_point.x,select_point.y,select_point.z)
+                          * Matrix_Rotate_X(g_VirtualScene["box"].AngleX)
+                          * Matrix_Rotate_Y(g_VirtualScene["box"].AngleY) * Matrix_Scale(0.15f, 0.15f, 0.15f);
         }
-        else if(!g_VirtualScene["box"].at_orig_coords && !g_VirtualScene["box"].picked_up){
-            model_box = Matrix_Translate(g_VirtualScene["box"].CoordX,0.0f,g_VirtualScene["box"].CoordZ) * Matrix_Scale(0.2f,0.2f,0.2f);
+        else if(!(g_VirtualScene["box"].at_orig_coords) && !(g_VirtualScene["box"].picked_up)){
+            model_box = Matrix_Translate(g_VirtualScene["box"].CoordX, 0.2f, g_VirtualScene["box"].CoordZ)
+                          * Matrix_Scale(0.15f, 0.15f, 0.15f);
         }
         else{
-            model_box = Matrix_Translate(3.5f,0.0f,0.9f) * Matrix_Scale(0.2f,0.2f,0.2f);
+            model_box = Matrix_Translate(1.0f,0.2f,3.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
         }
 
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model_box));
-        glUniform1i(object_id_uniform, DEFAULT);
-        DrawVirtualObject("box");
+        RederingObj(&boxmodel, model_box, BOX);
 
         // Box
         //model = Matrix_Translate(3.5f,0.0f,0.9f) * Matrix_Scale(0.2f,0.2f,0.2f);
@@ -1037,6 +1057,7 @@ void LoadShadersFromFiles()
     bbox_max_uniform        = glGetUniformLocation(program_id, "bbox_max");
     camera_view             = glGetUniformLocation(program_id, "camera_view");
     is_flashlight_on        = glGetUniformLocation(program_id, "is_flashlight_on"); // Variável booleana em shader_fragment.glsl
+    is_flashlightambient_on        = glGetUniformLocation(program_id, "is_flashlightambient_on"); // Variável booleana em shader_fragment.glsl
 
 
     Ka_uniform        = glGetUniformLocation(program_id, "Kau");
@@ -1685,6 +1706,17 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         }
         else{
             flashlight_on = true;
+        }
+    }
+
+    // Se o usuário apertar a tecla L, sinalizar que ligou a luz ambiente
+    if(key == GLFW_KEY_V && action == GLFW_PRESS)
+    {
+        if(flashlightambient_on){
+            flashlightambient_on = false;
+        }
+        else{
+            flashlightambient_on = true;
         }
     }
 

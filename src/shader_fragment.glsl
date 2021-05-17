@@ -20,6 +20,7 @@ uniform mat4 projection;
 
 uniform vec4 camera_view;
 uniform bool is_flashlight_on;
+uniform bool is_flashlightambient_on;
 
 // Identificador que define qual objeto está sendo desenhado no momento
 #define SPHERE 0
@@ -293,27 +294,33 @@ void main()
         q = 1.0;
     }
 
-    // Espectro da fonte de iluminação (lanterna)
     vec3 Iflash = vec3(1.0f,1.0f,1.0f);
 
     // Espectro da fonte de iluminação
     vec3 I = vec3(1.0f,1.0f,1.0f);
+
+    float light_ambient = 0.0;
+
+    if(is_flashlightambient_on){
+        light_ambient = 1.0;
+    }
+
 
     // Espectro da luz ambiente
     vec3 Ia = vec3(0.2f,0.2f,0.2f);//vec3(0.5f,0.5f,0.5f);
 
     // Termo difuso utilizando a lei dos cossenos de Lambert
     //vec3 lambert_diffuse_term = vec3(0.0,0.0,0.0);
-    vec3 lambert_diffuse_term = Kd * I * max(0, dot_n_l);// PREENCHA AQUI o termo difuso de Lambert
+    vec3 lambert_diffuse_term = Kd * I * max(0, dot_n_l) * light_ambient;// PREENCHA AQUI o termo difuso de Lambert
 
     // Termo ambiente
-    vec3 ambient_term = Ka * Ia;
+    vec3 ambient_term = Ka * Ia * light_ambient * light_ambient;
 
     // Termo especular utilizando o modelo de iluminação de Phong
     //vec3 phong_specular_term  = Ks * I * pow(max(0, dot(r, v)), q); // PREENCH AQUI o termo especular de Phong
 
     // Termo especular utilizando o modelo de iluminação de Blinn-Phong
-    vec3 phong_specular_term  = Ks * I * pow(max(0, dot(n, h)), q); // PREENCH AQUI o termo especular de Phong
+    vec3 phong_specular_term  = Ks * I * pow(max(0, dot(n, h)), q) * light_ambient; // PREENCH AQUI o termo especular de Phong
 
 
     //LANTERNA

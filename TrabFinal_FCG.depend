@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1621134008 source:c:\users\mathe\trabfinal_fcg\src\main.cpp
+1621213540 source:c:\users\mathe\trabfinal_fcg\src\main.cpp
 	<cmath>
 	<cstdio>
 	<cstdlib>
@@ -22,6 +22,7 @@
 	<stb_image.h>
 	"utils.h"
 	"matrices.h"
+	"collisions.h"
 
 1603713706 c:\users\mathe\trabfinal_fcg\include\glad\glad.h
 	<windows.h>
@@ -1883,4 +1884,22 @@
 
 1621089028 source:c:\users\abreu\desktop\codex\ufrgs\fcg\fcg\src\tiny_obj_loader.cpp
 	"tiny_obj_loader.h"
+
+1621213847 source:c:\users\mathe\trabfinal_fcg\src\collisions.cpp
+	<cstdlib>
+	<iostream>
+	"collisions.h"
+
+1621196978 c:\users\mathe\trabfinal_fcg\include\objects.h
+	<string>
+	<glad/glad.h>
+	<GLFW/glfw3.h>
+	<glm/mat4x4.hpp>
+	<glm/vec4.hpp>
+	<glm/gtc/type_ptr.hpp>
+
+1621213076 c:\users\mathe\trabfinal_fcg\include\collisions.h
+	<cstdlib>
+	<iostream>
+	"Objects.h"
 

@@ -74,6 +74,9 @@
 			<Add option="lib\libglfw3.a -lgdi32 -lopengl32" />
 			<Add directory="lib" />
 		</Linker>
+		<Unit filename="Objects.h" />
+		<Unit filename="include/collisions.h" />
+		<Unit filename="src/collisions.cpp" />
 		<Unit filename="src/glad.c">
 			<Option compilerVar="CC" />
 		</Unit>

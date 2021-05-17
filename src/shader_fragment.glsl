@@ -65,7 +65,7 @@ void main()
     //vec4 l = normalize(vec4(1.0,1.0,1.0,0.0));
 
     // Fonte de luz pontual / lâmpada da sala
-    vec4 p_l = vec4(2.0f,1.6f,2.0f, 1.0f);//-1.5f,1.6f,2.0f,1.0f);
+    vec4 p_l = vec4(2.0f,1.6f,2.0f, 1.0f);
 
     // Vetor que define o sentido da fonte de luz em relação ao ponto atual.
     vec4 l = normalize(p_l - p);
@@ -83,6 +83,7 @@ void main()
     // Vetor que define o sentido da câmera em relação ao ponto atual.
     vec4 v = normalize(camera_position - p);
 
+    vec4 h = (l + v)/length(l + v);
 
     //para não ter que calcular multiplas vezes o produto interno de n e l:
     float dot_n_l = dot(n,l);
@@ -92,6 +93,7 @@ void main()
 
     vec4 r_flash = -pFlashlight + 2*n*(dot(n, pFlashlight));
 
+    vec4 h_flash = (pFlashlight + v)/length(pFlashlight + v);
     // Parâmetros que definem as propriedades espectrais da superfície
     vec3 Kd; // Refletância difusa
     vec3 Ks; // Refletância especular
@@ -223,7 +225,9 @@ void main()
     vec3 ambient_term = Ka * Ia;
 
     // Termo especular utilizando o modelo de iluminação de Phong
-    vec3 phong_specular_term  = Ks * I * pow(max(0, dot(r, v)), q); // PREENCH AQUI o termo especular de Phong
+    //vec3 phong_specular_term  = Ks * I * pow(max(0, dot(r, v)), q); // PREENCH AQUI o termo especular de Phong
+    // Termo especular utilizando o modelo de iluminação de Blin-Phong
+    vec3 phong_specular_term  = Ks * I * pow(max(0, dot(n, h)), q); // PREENCH AQUI o termo especular de Phong
 
 
     //LANTERNA
@@ -232,7 +236,11 @@ void main()
     vec3 diffuse_flash = Kd * Iflash * max(0, dot(n, pFlashlight));// PREENCHA AQUI o termo difuso de Lambert
 
     // Termo especular utilizando o modelo de iluminação de Phong
-    vec3 specular_flash  = Ks * Iflash * pow(max(0, dot(r_flash, v)), q); // PREENCH AQUI o termo especular de Phong
+    //vec3 specular_flash  = Ks * Iflash * pow(max(0, dot(r_flash, v)), q); // PREENCH AQUI o termo especular de Phong
+
+    // Termo especular utilizando o modelo de iluminação de Blin-Phong
+    vec3 specular_flash  = Ks * Iflash * pow(max(0, dot(n, h_flash)), q); // PREENCH AQUI o termo especular de Phong
+
 
     float dist_to_p = length(camera_position - p); // distancia da câmera até o ponto p
     if(dist_to_p < 0.7f)

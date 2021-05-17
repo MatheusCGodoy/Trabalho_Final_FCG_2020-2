@@ -115,6 +115,10 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 int ValidatePosition(glm::vec4 position);
 
+//#include "Objects.h"
+#include "collisions.h"
+
+/*
 // Definimos uma estrutura que armazenará dados necessários para renderizar
 // cada objeto da cena virtual.
 struct SceneObject
@@ -127,6 +131,7 @@ struct SceneObject
     glm::vec3    bbox_min; // Axis-Aligned Bounding Box do objeto
     glm::vec3    bbox_max;
 };
+*/
 
 
 // A cena virtual é uma lista de objetos nomeados, guardados em um dicionário (map).
@@ -406,6 +411,8 @@ int main(int argc, char* argv[])
         // Se o usuário apertar a tecla W, mover a camera para frente (em direção ao vetor view)
         if(glfwGetKey(window, GLFW_KEY_W))//bW_pressed)
         {
+            //if(BOX_collision(g_VirtualScene["wall"],g_VirtualScene["wall"]))
+                //std::cout << "Collided\n";
 
             newx_position = camera_position_c -v*speed*dt;
             if (ValidatePosition(newx_position) == 1) {
@@ -651,6 +658,13 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, SPHERE);
         DrawVirtualObject("sphere");
+
+        glm::mat4 inverseModel =  Matrix_Scale(1/0.15f, 1/0.15f, 1/0.15f) * Matrix_Translate(-2.0f,-1.8f,-2.0f);
+        glm::vec4 vec_orig = camera_position_c * inverseModel;
+        glm::vec4 vec_end = (camera_position_c + (camera_view_vector*5.0f))* inverseModel;
+
+        if(LINE_collision(g_VirtualScene["sphere"], vec_orig, vec_end))
+            std::cout << "Colisao com esfera" << std::endl;
 
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o

@@ -369,6 +369,9 @@ int main(int argc, char* argv[])
     glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
     glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
 
+    // Ponto para seleção de objetos
+    glm::vec4 select_point = camera_position_c + (camera_view_vector*0.2f);
+
     // Vetor de gravidade:
     glm::vec4 gravity_vec = glm::vec4(0.0f,-0.3f,0.0f,0.0f);
 
@@ -702,7 +705,7 @@ int main(int argc, char* argv[])
         //if(LINE_collision(g_VirtualScene["wall"], p_orig, p_end, model_parede1))
             //std::cout << "Colisao com parede " << glfwGetTime() <<std::endl;
 
-        glm::vec4 select_point = camera_position_c + (camera_view_vector*0.2f);
+        select_point = camera_position_c + (camera_view_vector*0.2f);
         //if(pointAABB_collision(g_VirtualScene["wall"], select_point, model_parede1))
             //std::cout << "Colisão com parede" << glfwGetTime() << std::endl;
 

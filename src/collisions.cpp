@@ -4,13 +4,25 @@
 
 bool BOX_collision(const SceneObject& A, const SceneObject& B){
 
-    std::cout << "BBox_MAX_x : " << A.bbox_max[0];
+    //std::cout << "BBox_MAX_x : " << A.bbox_max[0];
+
+    glm::vec4 A_max = glm::vec4(A.bbox_max, 1.0f);
+    glm::vec4 A_min = glm::vec4(A.bbox_min, 1.0f);
+
+    A_min = model * A_min;
+    A_max = model * A_max;
+
+    glm::vec4 B_max = glm::vec4(A.bbox_max, 1.0f);
+    glm::vec4 B_min = glm::vec4(A.bbox_min, 1.0f);
+
+    B_min = model * B_min;
+    B_max = model * B_max;
 
     // Se tem sobreposição em todas as dimensões (x, y e z) está havendo uma colisão
     for(int i = 0; i < 3; i++){
-        if(A.bbox_min[i] > B.bbox_max[i])
+        if(A_min[i] > B_max[i])
             return false;
-        if(A.bbox_max[i] < B.bbox_min[i])
+        if(A_max[i] < B_min[i])
             return false;
     }
 
@@ -75,14 +87,16 @@ bool LINE_collision(const SceneObject& A, const glm::vec4 p_origin, const glm::v
     float f_low = 0;
     float f_high = 0;
 
-    //glm::vec4 A_max = glm::vec4(A.bbox_max, 1.0f);
-    //glm::vec4 A_min = glm::vec4(A.bbox_min, 1.0f);
 
-    for(int i = 0; i < 3; i++){
-        //printf("Loop %d\n", i);
-        if(!ClipLine(i, A, p_origin, p_end, model, f_low, f_high))
-            return false;
-    }
+    if(!ClipLine(1, A, p_origin, p_end, model, f_low, f_high))
+        return false;
+
+    if(!ClipLine(2, A, p_origin, p_end, model, f_low, f_high))
+        return false;
+
+    if(!ClipLine(3, A, p_origin, p_end, model, f_low, f_high))
+        return false;
+
 
     //glm::vec4 d = vec_end - vec_origin;
 

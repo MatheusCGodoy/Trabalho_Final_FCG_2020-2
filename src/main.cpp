@@ -313,6 +313,10 @@ int main(int argc, char* argv[])
     ComputeNormals(&boxmodel);
     BuildTrianglesAndAddToVirtualScene(&boxmodel);
 
+        ObjModel displaymodel("../../data/display.obj");
+    ComputeNormals(&displaymodel);
+    BuildTrianglesAndAddToVirtualScene(&displaymodel);
+
     //ObjModel light_switchmodel("../../data/light_switch.obj");
     //ComputeNormals(&light_switchmodel);
     //BuildTrianglesAndAddToVirtualScene(&light_switchmodel);
@@ -380,6 +384,8 @@ int main(int argc, char* argv[])
     float bunnyCoordX = 2.0f;
     float bunnyCoordY = 0.2f;
     float bunnyCoordZ = 2.0f;
+
+    PrintObjModelInfo(&displaymodel);
 
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
@@ -727,8 +733,8 @@ int main(int argc, char* argv[])
         RederingObj(&boxmodel, model, BOXNORMAL);
 
 
-        //model = Matrix_Translate(1.0f,1.0f,3.0f) * Matrix_Rotate_Y(3.15) * Matrix_Translate(-1.0f,0.0f,-1.9f) * Matrix_Scale(0.03f,0.03f,0.03f);
-        //RederingObj(&light_switchmodel, model, LIGTHSWITCH);
+        model = Matrix_Translate(0.5f,0.6f,4.96f) * Matrix_Scale(0.3f,0.3f,0.3f);
+        RederingObj(&displaymodel, model, DEFAULT);
 
         //glm::mat4 inverseModel =  Matrix_Scale(1/0.15f, 1/0.15f, 1/0.15f) * Matrix_Translate(-2.0f,-1.8f,-2.0f);
         //glm::vec4 vec_orig = camera_position_c * inverseModel;

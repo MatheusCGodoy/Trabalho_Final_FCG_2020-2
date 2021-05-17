@@ -297,7 +297,7 @@ void main()
     vec3 Iflash = vec3(1.0f,1.0f,1.0f);
 
     // Espectro da fonte de iluminação
-    vec3 I = vec3(0.0f,0.0f,0.0f);
+    vec3 I = vec3(1.0f,1.0f,1.0f);
 
     // Espectro da luz ambiente
     vec3 Ia = vec3(0.0f,0.0f,0.0f);

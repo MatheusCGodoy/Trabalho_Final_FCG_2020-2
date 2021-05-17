@@ -114,6 +114,12 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 int ValidatePosition(glm::vec4 position);
+void RederingObj(ObjModel* models, glm::mat4 model, int mod);
+
+#define SPHERE 0
+#define WALL  2
+#define DEFAULT  3
+#define LIGTHSWITCH 4
 
 //#include "Objects.h"
 #include "collisions.h"
@@ -196,6 +202,12 @@ GLint is_flashlight_on;
 GLuint g_NumLoadedTextures = 0;
 
 
+GLint Ka_uniform;
+GLint Kd_uniform;
+GLint Ks_uniform;
+
+
+
 //################# MAIN #######################
 int main(int argc, char* argv[])
 {
@@ -273,9 +285,10 @@ int main(int argc, char* argv[])
     //
     LoadShadersFromFiles();
 
-    // Carregamos as imagens para serem utilizadas como texturas (COLOCAR TEXTURAS AQUI?)
-    LoadTextureImage("../../data/tc-earth_daymap_surface.jpg");      // TextureImage0
-    LoadTextureImage("../../data/tc-earth_nightmap_citylights.gif"); // TextureImage1
+    // Carregamos as imagens para serem utilizadas como texturas
+    LoadTextureImage("../../data/10121_Light_Switch_v1_Diffuse_SG.jpg");      // TextureImage0
+    LoadTextureImage("../../data/wall.jpg"); // TextureImage1
+    LoadTextureImage("../../data/FuseBoxWall_NoAO.jpg");
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
     ObjModel spheremodel("../../data/sphere.obj");
@@ -293,6 +306,14 @@ int main(int argc, char* argv[])
     ObjModel wallmodel("../../data/wall.obj");
     ComputeNormals(&wallmodel);
     BuildTrianglesAndAddToVirtualScene(&wallmodel);
+
+    //ObjModel boxmodel("../../data/box.obj");
+    //ComputeNormals(&boxmodel);
+    //BuildTrianglesAndAddToVirtualScene(&boxmodel);
+
+    //ObjModel light_switchmodel("../../data/light_switch.obj");
+    //ComputeNormals(&light_switchmodel);
+    //BuildTrianglesAndAddToVirtualScene(&light_switchmodel);
 
 
     if ( argc > 1 )
@@ -607,12 +628,11 @@ int main(int argc, char* argv[])
         #define BUNNY  1
         #define PLANE  2
 
-
         for (float j = 1.0; j <= 4; j++){
             for (float i = 0.0; i < 3; i++ ){
                 model = Matrix_Translate(j,1.95f, i * 2.00) * Matrix_Rotate_Z(1.57) ;
                 glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-                glUniform1i(object_id_uniform, PLANE);
+                glUniform1i(object_id_uniform, WALL);
                 DrawVirtualObject("wall");
             }
         }
@@ -621,20 +641,20 @@ int main(int argc, char* argv[])
             for (float i = 0.0; i < 3; i++ ){
                 model = Matrix_Translate(j,0.00f, i * 2.00) * Matrix_Rotate_Z(1.57) ;
                 glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-                glUniform1i(object_id_uniform, PLANE);
+                glUniform1i(object_id_uniform, WALL);
                 DrawVirtualObject("wall");
             }
         }
 
         model = Matrix_Translate(2.0f,1.95f, 0.00) * Matrix_Rotate_Z(1.57) ;
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-            glUniform1i(object_id_uniform, PLANE);
+            glUniform1i(object_id_uniform, WALL);
             DrawVirtualObject("wall");
 
         for (float i = 0.0; i < 3; i++ ){
             model = Matrix_Translate(0.0f,0.0f,(i * 2.0)) * Matrix_Scale(1.0f,2.0f,1.0f);
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-            glUniform1i(object_id_uniform, PLANE);
+            glUniform1i(object_id_uniform, WALL);
             DrawVirtualObject("wall");
         }
 
@@ -654,7 +674,7 @@ int main(int argc, char* argv[])
         for (float i = 0.0; i < 3; i++){
             model = Matrix_Translate(4.00f,0.0f,(i * 2.00))  * Matrix_Scale(1.0f,2.0f,1.0f);
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-            glUniform1i(object_id_uniform, PLANE);
+            glUniform1i(object_id_uniform, WALL);
             DrawVirtualObject("wall");
         }
 
@@ -662,23 +682,27 @@ int main(int argc, char* argv[])
         for (float i = 0.0; i < 2; i++){
             model = Matrix_Rotate_Y(29.85) * Matrix_Translate(5.0f,0.0f,-3.0f + (i * 2.00))  * Matrix_Scale(1.0f,2.0f,1.0f) ;
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-            glUniform1i(object_id_uniform, PLANE);
+            glUniform1i(object_id_uniform, WALL);
             DrawVirtualObject("wall");
         }
 
         for (float i = 0.0; i < 2; i++){
             model = Matrix_Rotate_Y(29.85) * Matrix_Translate(-1.0f,0.0f,-3.0f + (i * 2.00))  * Matrix_Scale(1.0f,2.0f,1.0f) ;
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-            glUniform1i(object_id_uniform, PLANE);
+            glUniform1i(object_id_uniform, WALL);
             DrawVirtualObject("wall");
         }
 
 
-        model = Matrix_Translate(2.0f,1.8f,2.0f)
-              * Matrix_Scale(0.15f, 0.15f, 0.15f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, SPHERE);
-        DrawVirtualObject("sphere");
+        model = Matrix_Translate(2.0f,1.8f,2.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&spheremodel, model, SPHERE);
+
+
+        //model = Matrix_Translate(3.5f,0.0f,0.9f) * Matrix_Scale(0.2f,0.2f,0.2f);
+        //RederingObj(&boxmodel, model, DEFAULT);
+
+        //model = Matrix_Translate(1.0f,1.0f,3.0f) * Matrix_Rotate_Y(3.15) * Matrix_Translate(-1.0f,0.0f,-1.9f) * Matrix_Scale(0.03f,0.03f,0.03f);
+        //RederingObj(&light_switchmodel, model, LIGTHSWITCH);
 
         //glm::mat4 inverseModel =  Matrix_Scale(1/0.15f, 1/0.15f, 1/0.15f) * Matrix_Translate(-2.0f,-1.8f,-2.0f);
         //glm::vec4 vec_orig = camera_position_c * inverseModel;
@@ -914,6 +938,11 @@ void LoadShadersFromFiles()
     bbox_max_uniform        = glGetUniformLocation(program_id, "bbox_max");
     camera_view             = glGetUniformLocation(program_id, "camera_view");
     is_flashlight_on        = glGetUniformLocation(program_id, "is_flashlight_on"); // Variável booleana em shader_fragment.glsl
+
+
+    Ka_uniform        = glGetUniformLocation(program_id, "Kau");
+    Kd_uniform        = glGetUniformLocation(program_id, "Kdu");
+    Ks_uniform        = glGetUniformLocation(program_id, "Ksu");
 
 
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
@@ -1509,7 +1538,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     }
 
     // Se o usuário apertar a tecla espaço, resetamos os ângulos de Euler para zero.
-    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+    if (key == GLFW_KEY_B && action == GLFW_PRESS)
     {
         g_AngleX = 0.0f;
         g_AngleY = 0.0f;
@@ -1521,16 +1550,16 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     }
 
     // Se o usuário apertar a tecla P, utilizamos projeção perspectiva.
-    if (key == GLFW_KEY_P && action == GLFW_PRESS)
-    {
-        g_UsePerspectiveProjection = true;
-    }
+    //if (key == GLFW_KEY_P && action == GLFW_PRESS)
+    //{
+    //    g_UsePerspectiveProjection = true;
+    //}
 
     // Se o usuário apertar a tecla O, utilizamos projeção ortográfica.
-    if (key == GLFW_KEY_O && action == GLFW_PRESS)
-    {
-        g_UsePerspectiveProjection = false;
-    }
+    //if (key == GLFW_KEY_O && action == GLFW_PRESS)
+    //{
+    //    g_UsePerspectiveProjection = false;
+    //}
 
     // Se o usuário apertar a tecla H, fazemos um "toggle" do texto informativo mostrado na tela.
     if (key == GLFW_KEY_H && action == GLFW_PRESS)
@@ -1861,3 +1890,33 @@ void PrintObjModelInfo(ObjModel* model)
     printf("\n");
   }
 }
+
+
+void RederingObj(ObjModel* models, glm::mat4 model, int mod)
+{
+    const tinyobj::attrib_t                & attrib    = models->attrib;
+    const std::vector<tinyobj::shape_t>    & shapes    = models->shapes;
+    const std::vector<tinyobj::material_t> & materials = models->materials;
+
+
+    glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+    glUniform1i(object_id_uniform, mod);
+
+    if ( materials.size() > 0){
+        for (size_t i = 0; i < shapes.size(); i++) {
+            for (size_t f = 0; f < shapes[i].mesh.num_face_vertices.size(); f++) {
+                glm::vec3 Ka = glm::vec3(materials[shapes[i].mesh.material_ids[f]].ambient[0],materials[shapes[i].mesh.material_ids[f]].ambient[1],materials[shapes[i].mesh.material_ids[f]].ambient[2]); //
+                glm::vec3 Kd = glm::vec3(materials[shapes[i].mesh.material_ids[f]].diffuse[0],materials[shapes[i].mesh.material_ids[f]].diffuse[1],materials[shapes[i].mesh.material_ids[f]].diffuse[2]); //
+                glm::vec3 Ks = glm::vec3(materials[shapes[i].mesh.material_ids[f]].specular[0],materials[shapes[i].mesh.material_ids[f]].specular[1],materials[shapes[i].mesh.material_ids[f]].specular[2]); //
+                glUniform3f(Ka_uniform, Ka.x, Ka.y, Ka.z);
+                glUniform3f(Kd_uniform, Kd.x, Kd.y, Kd.z);
+                glUniform3f(Ks_uniform, Ks.x, Ks.y, Ks.z);
+                DrawVirtualObject(shapes[i].name.c_str());
+            }
+
+        }
+    } else {
+        DrawVirtualObject(shapes[0].name.c_str());
+    }
+}
+

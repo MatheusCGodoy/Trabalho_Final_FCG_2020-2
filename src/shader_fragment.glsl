@@ -24,7 +24,10 @@ uniform bool is_flashlight_on;
 // Identificador que define qual objeto está sendo desenhado no momento
 #define SPHERE 0
 #define BUNNY  1
-#define PLANE  2
+#define WALL  2
+#define DEFAULT  3
+#define LIGTHSWITCH  4
+
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -40,8 +43,14 @@ uniform sampler2D TextureImage2;
 out vec3 color;
 
 // Constantes
-#define M_PI   3.14159265358979323846
+#define M_PI    3.14159265358979323846
 #define M_PI_2 1.57079632679489661923
+
+uniform vec3 Kdu;
+uniform vec3 Ksu;
+uniform vec3 Kau;
+
+
 
 void main()
 {
@@ -104,6 +113,8 @@ void main()
     vec3 Ka; // Refletância ambiente
     float q; // Expoente especular para o modelo de iluminação de Phong
 
+    vec3 Kd0 = vec3(0.0, 0.0, 0.0);
+    bool hasKD0 = false;
 
     // Coordenadas de textura U e V
     float U = 0.0;
@@ -191,7 +202,7 @@ void main()
         //q = 32.0; //phong
         q = 80; //blinn-phong
     }
-    else if ( object_id == PLANE )
+    else if ( object_id == WALL )
     {
         // Coordenadas de textura do plano, obtidas do arquivo OBJ.
         U = texcoords.x;
@@ -199,11 +210,41 @@ void main()
 
         // Propriedades espectrais do plano
         //Kd = texture(TextureImage0, vec2(U,V)).rgb;
-        Kd = vec3(0.0,0.5,1.0);
+
+
+        Kd = vec3(0.0,0.5,1.0); //vec3(0.2,0.3,1.0);
         Ks = vec3(0.3,0.3,0.3);
         Ka = vec3(0.0,0.0,0.0);
-        //q = 60.0; //phong
-        q = 100.0f; //blinn-phong
+        q = 100.0;
+    }
+    else if ( object_id == DEFAULT ) {
+        // Coordenadas de textura do plano, obtidas do arquivo OBJ.
+        U = texcoords.x;
+        V = texcoords.y;
+
+
+
+        // Propriedades espectrais do plano
+        //Kd = texture(TextureImage0, vec2(U,V)).rgb;
+        Ka = Kau;
+        Kd = Kdu;
+        Ks = Ksu;
+        q = 1.0;
+    }
+    else if ( object_id == LIGTHSWITCH ) {
+        // Coordenadas de textura do plano, obtidas do arquivo OBJ.
+        U = texcoords.x;
+        V = texcoords.y;
+
+        hasKD0 = true;
+        Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
+
+        // Propriedades espectrais do plano
+        //Kd = texture(TextureImage0, vec2(U,V)).rgb;
+        Ka = Kau;
+        Kd = Kdu;
+        Ks = Ksu;
+        q = 1.0;
     }
     else // Objeto desconhecido = preto
     {
@@ -266,7 +307,11 @@ void main()
     //color = lambert_diffuse_term + ambient_term; // para testar sem iluminação especular
     // Cor final do fragmento calculada com uma combinação dos termos difuso,
     // especular, e ambiente. Veja slide 129 do documento Aula_17_e_18_Modelos_de_Iluminacao.pdf.
-    color = lswitch*(lambert_diffuse_term + phong_specular_term + ambient_term) + intensity*(diffuse_flash + specular_flash);
+    if (hasKD0){
+        color = Kd0 * lswitch*(lambert_diffuse_term + phong_specular_term + ambient_term) + intensity*(diffuse_flash + specular_flash);
+    } else {
+        color = lswitch*(lambert_diffuse_term + phong_specular_term + ambient_term) + intensity*(diffuse_flash + specular_flash);
+    }
 
     // Cor final com correção gamma, considerando monitor sRGB.
     // Veja https://en.wikipedia.org/w/index.php?title=Gamma_correction&oldid=751281772#Windows.2C_Mac.2C_sRGB_and_TV.2Fvideo_standard_gammas

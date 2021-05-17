@@ -2,19 +2,36 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
+<<<<<<< HEAD
 	<File name="src\collisions.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="1975" topLine="48" />
+=======
+	<File name="src\tiny_obj_loader.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+>>>>>>> f1ee38916acc2835e86507d37318f09d19344d77
+		</Cursor>
+	</File>
+	<File name="src\shader_vertex.glsl" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="405" topLine="9" />
+		</Cursor>
+	</File>
+<<<<<<< HEAD
+	<File name="src\shader_fragment.glsl" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="9776" topLine="241" />
+=======
+	<File name="src\stb_image.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="58" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="src\glad.c" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="528" topLine="12" />
-		</Cursor>
-	</File>
-	<File name="src\shader_fragment.glsl" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="9776" topLine="241" />
+>>>>>>> f1ee38916acc2835e86507d37318f09d19344d77
 		</Cursor>
 	</File>
 	<File name="src\textrendering.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -22,6 +39,7 @@
 			<Cursor1 position="0" topLine="0" />
 		</Cursor>
 	</File>
+<<<<<<< HEAD
 	<File name="src\main.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="2" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="28422" topLine="659" />
@@ -33,8 +51,11 @@
 		</Cursor>
 	</File>
 	<File name="src\tiny_obj_loader.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+=======
+	<File name="src\shader_fragment.glsl" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
+>>>>>>> f1ee38916acc2835e86507d37318f09d19344d77
 		<Cursor>
-			<Cursor1 position="0" topLine="0" />
+			<Cursor1 position="652" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="include\collisions.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -44,12 +65,16 @@
 	</File>
 	<File name="Objects.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
+<<<<<<< HEAD
 			<Cursor1 position="760" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="src\stb_image.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="58" topLine="0" />
+=======
+			<Cursor1 position="37463" topLine="859" />
+>>>>>>> f1ee38916acc2835e86507d37318f09d19344d77
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

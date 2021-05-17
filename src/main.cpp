@@ -693,7 +693,7 @@ int main(int argc, char* argv[])
         model = Matrix_Translate(2.0f,1.8f,2.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
         RederingObj(&spheremodel, model, SPHERE);
 
-
+/* 
         model = Matrix_Translate(3.5f,0.0f,0.0f) * Matrix_Scale(0.2f,0.5f,0.2f);
         RederingObj(&boxmodel, model, BOXNORMAL);
 
@@ -734,7 +734,7 @@ int main(int argc, char* argv[])
 
 
         model = Matrix_Translate(0.5f,0.6f,4.96f) * Matrix_Scale(0.3f,0.3f,0.3f);
-        RederingObj(&displaymodel, model, DEFAULT);
+        RederingObj(&displaymodel, model, DEFAULT); */
 
         //glm::mat4 inverseModel =  Matrix_Scale(1/0.15f, 1/0.15f, 1/0.15f) * Matrix_Translate(-2.0f,-1.8f,-2.0f);
         //glm::vec4 vec_orig = camera_position_c * inverseModel;
@@ -774,8 +774,8 @@ int main(int argc, char* argv[])
         }
 
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, BUNNY);
-        DrawVirtualObject("box");
+
+        RederingObj(&boxmodel, model, BOX);
 
         //if(LINE_collision(g_VirtualScene["bunny"], p_orig, p_end, model))
             //std::cout << "Colisao com coelho " << glfwGetTime() << std::endl;

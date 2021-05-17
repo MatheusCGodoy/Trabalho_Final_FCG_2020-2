@@ -2,7 +2,7 @@
 #include <iostream>
 #include "collisions.h"
 
-bool BOX_collision(const SceneObject& A, const SceneObject& B){
+bool BOX_collision(const SceneObject& A, const SceneObject& B, const glm::mat4 model){
 
     //std::cout << "BBox_MAX_x : " << A.bbox_max[0];
 

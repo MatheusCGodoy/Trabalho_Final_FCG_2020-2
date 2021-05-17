@@ -1,7 +1,8 @@
 # Blender v2.92.0 OBJ File: ''
 # www.blender.org
 mtllib ../../data/box.mtl
-o Cube
+o Cube 
+g box
 v 1.000000 0.863325 -1.343428
 v 1.000000 -0.863325 -1.343428
 v 1.000000 0.863325 1.343428

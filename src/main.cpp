@@ -116,6 +116,8 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 int ValidatePosition(glm::vec4 position);
 void RederingObj(ObjModel* models, glm::mat4 model, int mod);
 
+void UpdateInteractiveObject(GLFWwindow* window, const char *objname, glm::mat4& model, glm::vec4 select_point);
+
 #define SPHERE 0
 #define WALL  2
 #define DEFAULT  3
@@ -208,6 +210,13 @@ GLint Ka_uniform;
 GLint Kd_uniform;
 GLint Ks_uniform;
 
+
+//Dados do coelho:
+//bool picked_bunny = false;
+//bool at_orig_coords = true;
+//float bunnyCoordX = 2.0f;
+//float bunnyCoordY = 0.2f;
+//float bunnyCoordZ = 2.0f;
 
 
 //################# MAIN #######################
@@ -317,9 +326,9 @@ int main(int argc, char* argv[])
     ComputeNormals(&displaymodel);
     BuildTrianglesAndAddToVirtualScene(&displaymodel);
 
-    //ObjModel light_switchmodel("../../data/light_switch.obj");
-    //ComputeNormals(&light_switchmodel);
-    //BuildTrianglesAndAddToVirtualScene(&light_switchmodel);
+    ObjModel light_switchmodel("../../data/light_switch.obj");
+    ComputeNormals(&light_switchmodel);
+    BuildTrianglesAndAddToVirtualScene(&light_switchmodel);
 
 
     if ( argc > 1 )
@@ -371,6 +380,51 @@ int main(int argc, char* argv[])
 
     // Vetor de pulo:
     glm::vec4 jump_vec = glm::vec4(0.0f,0.7f,0.0f,0.0f);
+
+
+    //Inicializando informações do coelho
+    g_VirtualScene["bunny"].at_orig_coords = true;
+    g_VirtualScene["bunny"].picked_up = false;
+    g_VirtualScene["bunny"].CoordX = 2.0f;
+    g_VirtualScene["bunny"].CoordY = 0.2f;
+    g_VirtualScene["bunny"].CoordZ = 2.0f;
+    g_VirtualScene["bunny"].AngleX = 0.0f;
+    g_VirtualScene["bunny"].AngleY = 0.0f;
+
+    //Inicializando informações da caixa
+    g_VirtualScene["box"].at_orig_coords = true;
+    g_VirtualScene["box"].picked_up = false;
+    g_VirtualScene["box"].CoordX = 3.5f;
+    g_VirtualScene["box"].CoordY = 0.2f;
+    g_VirtualScene["box"].CoordZ = 0.9f;
+    g_VirtualScene["box"].AngleX = 0.0f;
+    g_VirtualScene["box"].AngleY = 0.0f;
+
+    // WALL Object:
+    // Teto
+    glm::mat4 model_teto = Matrix_Translate(4.0,2.00f, 2.00) * Matrix_Rotate_Z(1.57) * Matrix_Scale(1.0f,4.0f,3.0f);
+
+    // Chão
+    glm::mat4 model_chao = Matrix_Translate(4.0,0.00f, 2.00) * Matrix_Rotate_Z(1.57) * Matrix_Scale(1.0f,4.0f,3.0f);
+
+    // Parede 1
+    glm::mat4 model_parede1 = Matrix_Translate(0.0f,0.0f,2.0) * Matrix_Scale(2.0f,2.0f,3.0f);
+
+    // Parede 2
+    glm::mat4 model_parede2 = Matrix_Translate(4.00f,0.0f,2.00) * Matrix_Scale(1.0f,2.0f,3.0f);
+
+    // Parede 3
+    glm::mat4 model_parede3 = Matrix_Rotate_Y(29.85) * Matrix_Translate(5.0f,0.0f,-2.0f) * Matrix_Scale(1.0f,2.0f,2.0f);
+
+    // Parede 4
+    glm::mat4 model_parede4 = Matrix_Rotate_Y(29.85) * Matrix_Translate(-1.0f,0.0f,-2.0f) * Matrix_Scale(1.0f,2.0f,2.0f);
+
+    // BOX
+    glm::mat4 model_box = Matrix_Translate(3.5f,0.0f,0.9f) * Matrix_Scale(0.2f,0.2f,0.2f);
+
+    // BUNNY
+    glm::mat4 model_bunny = Matrix_Translate(2.0f,0.2f,2.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+
 
     //Medição do tempo a cada frame
     float time_now = glfwGetTime();
@@ -637,23 +691,23 @@ int main(int argc, char* argv[])
         #define PLANE  2
 
         // Teto
-        model = Matrix_Translate(4.0,2.00f, 2.00) * Matrix_Rotate_Z(1.57)  * Matrix_Scale(1.0f,4.0f,3.0f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        //model = Matrix_Translate(4.0,2.00f, 2.00) * Matrix_Rotate_Z(1.57)  * Matrix_Scale(1.0f,4.0f,3.0f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model_teto));
         glUniform1i(object_id_uniform, WALL);
         DrawVirtualObject("wall");
 
         //Chão
-        model = Matrix_Translate(4.0,0.00f, 2.00) * Matrix_Rotate_Z(1.57)  * Matrix_Scale(1.0f,4.0f,3.0f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        //model = Matrix_Translate(4.0,0.00f, 2.00) * Matrix_Rotate_Z(1.57)  * Matrix_Scale(1.0f,4.0f,3.0f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model_chao));
         glUniform1i(object_id_uniform, WALL);
         DrawVirtualObject("wall");
 
 
-
-        model = Matrix_Translate(0.0f,0.0f,2.0) * Matrix_Scale(2.0f,2.0f,3.0f);
-            glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-            glUniform1i(object_id_uniform, WALL);
-            DrawVirtualObject("wall");
+        // Parede 1
+        //model = Matrix_Translate(0.0f,0.0f,2.0) * Matrix_Scale(2.0f,2.0f,3.0f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model_parede1));
+        glUniform1i(object_id_uniform, WALL);
+        DrawVirtualObject("wall");
 
         //glm::mat4 inverseModel =  Matrix_Scale(1.0f/1.0f, 1.0f/2.0f, 1.0f/1.0f) * Matrix_Translate(-0.0f,-0.0f,-2.0f);
         //glm::vec4 vec_orig = camera_position_c * inverseModel;
@@ -661,80 +715,42 @@ int main(int argc, char* argv[])
         glm::vec4 p_orig = camera_position_c;
         glm::vec4 p_end = camera_position_c + (camera_view_vector*0.2f);
 
-        //if(LINE_collision(g_VirtualScene["wall"], p_orig, p_end, model))
+        //if(LINE_collision(g_VirtualScene["wall"], p_orig, p_end, model_parede1))
             //std::cout << "Colisao com parede " << glfwGetTime() <<std::endl;
 
         glm::vec4 select_point = camera_position_c + (camera_view_vector*0.2f);
-        //if(pointAABB_collision(g_VirtualScene["wall"], select_point, model))
+        //if(pointAABB_collision(g_VirtualScene["wall"], select_point, model_parede1))
             //std::cout << "Colisão com parede" << glfwGetTime() << std::endl;
 
- 
-       model = Matrix_Translate(4.00f,0.0f,2.00)  * Matrix_Scale(1.0f,2.0f,3.0f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, WALL);
-        DrawVirtualObject("wall");
-  
 
-
-        model = Matrix_Rotate_Y(29.85) * Matrix_Translate(5.0f,0.0f,-2.0f)  * Matrix_Scale(1.0f,2.0f,2.0f) ;
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        // Parede 2
+        //model = Matrix_Translate(4.00f,0.0f,2.00)  * Matrix_Scale(1.0f,2.0f,3.0f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model_parede2));
         glUniform1i(object_id_uniform, WALL);
         DrawVirtualObject("wall");
 
 
-
-        model = Matrix_Rotate_Y(29.85) * Matrix_Translate(-1.0f,0.0f,-2.0f)  * Matrix_Scale(1.0f,2.0f,2.0f) ;
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        // Parede 3
+        //model = Matrix_Rotate_Y(29.85) * Matrix_Translate(5.0f,0.0f,-2.0f)  * Matrix_Scale(1.0f,2.0f,2.0f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model_parede3));
         glUniform1i(object_id_uniform, WALL);
         DrawVirtualObject("wall");
 
 
+        // Parede 4
+        //model = Matrix_Rotate_Y(29.85) * Matrix_Translate(-1.0f,0.0f,-2.0f)  * Matrix_Scale(1.0f,2.0f,2.0f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model_parede4));
+        glUniform1i(object_id_uniform, WALL);
+        DrawVirtualObject("wall");
 
+
+        // Lightbulb
         model = Matrix_Translate(2.0f,1.8f,2.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
         RederingObj(&spheremodel, model, SPHERE);
 
-/* 
-        model = Matrix_Translate(3.5f,0.0f,0.0f) * Matrix_Scale(0.2f,0.5f,0.2f);
-        RederingObj(&boxmodel, model, BOXNORMAL);
-
-        model = Matrix_Translate(3.5f,0.0f,1.5f) * Matrix_Scale(0.2f,0.5f,0.2f);
-        RederingObj(&boxmodel, model, BOXNORMAL);
-
-        model = Matrix_Translate(3.5f,0.0f,3.0f) * Matrix_Scale(0.2f,0.5f,0.2f);
-        RederingObj(&boxmodel, model, BOX);
-
-        model = Matrix_Translate(3.5f,0.0f,4.5f) * Matrix_Scale(0.2f,0.5f,0.2f);
-        RederingObj(&boxmodel, model, BOXNORMAL);
-
-        
-        model = Matrix_Translate(2.5f,0.0f,0.0f) * Matrix_Scale(0.2f,0.5f,0.2f);
-        RederingObj(&boxmodel, model, BOXNORMAL);
-
-        model = Matrix_Translate(2.5f,0.0f,1.5f) * Matrix_Scale(0.2f,0.5f,0.2f);
-        RederingObj(&boxmodel, model, BOXNORMAL);
-
-        model = Matrix_Translate(2.5f,0.0f,3.0f) * Matrix_Scale(0.2f,0.5f,0.2f);
-        RederingObj(&boxmodel, model, BOXNORMAL);
-
-        model = Matrix_Translate(2.5f,0.0f,4.5f) * Matrix_Scale(0.2f,0.5f,0.2f);
-        RederingObj(&boxmodel, model, BOX);
-
-        
-        model = Matrix_Translate(1.5f,0.0f,0.0f) * Matrix_Scale(0.2f,0.5f,0.2f);
-        RederingObj(&boxmodel, model, BOXNORMAL);
-
-        model = Matrix_Translate(1.5f,0.0f,1.5f) * Matrix_Scale(0.2f,0.5f,0.2f);
-        RederingObj(&boxmodel, model, BOX);
-
-        model = Matrix_Translate(1.5f,0.0f,3.0f) * Matrix_Scale(0.2f,0.5f,0.2f);
-        RederingObj(&boxmodel, model, BOXNORMAL);
-
-        model = Matrix_Translate(1.5f,0.0f,4.5f) * Matrix_Scale(0.2f,0.5f,0.2f);
-        RederingObj(&boxmodel, model, BOXNORMAL);
-
-
-        model = Matrix_Translate(0.5f,0.6f,4.96f) * Matrix_Scale(0.3f,0.3f,0.3f);
-        RederingObj(&displaymodel, model, DEFAULT); */
+        // Lightswitch
+        model = Matrix_Translate(1.0f,1.0f,3.0f) * Matrix_Rotate_Y(3.15) * Matrix_Translate(-1.0f,0.0f,-1.95f) * Matrix_Scale(0.03f,0.03f,0.03f);
+        RederingObj(&light_switchmodel, model, LIGTHSWITCH);
 
         //glm::mat4 inverseModel =  Matrix_Scale(1/0.15f, 1/0.15f, 1/0.15f) * Matrix_Translate(-2.0f,-1.8f,-2.0f);
         //glm::vec4 vec_orig = camera_position_c * inverseModel;
@@ -750,49 +766,100 @@ int main(int argc, char* argv[])
         //if(pointAABB_collision(g_VirtualScene["sphere"], select_point, model))
             //std::cout << "Colisão com esfera" << glfwGetTime() << std::endl;
 
+        // Ponto de seleção - usado para pegar os objetos - teste de intersecção
         select_point = camera_position_c + (camera_view_vector*0.2f);
 
-        if(picked_bunny && glfwGetKey(window, GLFW_KEY_E)){
-            picked_bunny = false;
+        // Testa se está segurando o coelho
+        if(g_VirtualScene["bunny"].picked_up && glfwGetKey(window, GLFW_KEY_E)){
+            g_VirtualScene["bunny"].picked_up = false;
+            g_VirtualScene["bunny"].AngleX = 0.0f;
+            g_VirtualScene["bunny"].AngleY = 0.0f;
         }
 
-        if(picked_bunny){
-            bunnyCoordX = select_point.x;
-            bunnyCoordY = select_point.y;
-            bunnyCoordZ = select_point.z;
+        if(g_VirtualScene["bunny"].picked_up){
+            g_VirtualScene["bunny"].CoordX = select_point.x;
+            g_VirtualScene["bunny"].CoordY = select_point.y;
+            g_VirtualScene["bunny"].CoordZ = select_point.z;
 
-            model = Matrix_Translate(select_point.x,select_point.y,select_point.z)
-                  * Matrix_Scale(0.15f, 0.15f, 0.15f);
+            model_bunny = Matrix_Translate(select_point.x,select_point.y,select_point.z)
+                          * Matrix_Rotate_X(g_VirtualScene["bunny"].AngleX)
+                          * Matrix_Rotate_Y(g_VirtualScene["bunny"].AngleY) * Matrix_Scale(0.15f, 0.15f, 0.15f);
         }
-        else if(!at_orig_coords && !picked_bunny){
-            model = Matrix_Translate(bunnyCoordX,0.2f,bunnyCoordZ)
-                  * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        else if(!(g_VirtualScene["bunny"].at_orig_coords) && !(g_VirtualScene["bunny"].picked_up)){
+            model_bunny = Matrix_Translate(g_VirtualScene["bunny"].CoordX, 0.2f, g_VirtualScene["bunny"].CoordZ)
+                          * Matrix_Scale(0.15f, 0.15f, 0.15f);
         }
         else{
-            model = Matrix_Translate(2.0f,0.2f,2.0f)
-                  * Matrix_Scale(0.15f, 0.15f, 0.15f);
+            model_bunny = Matrix_Translate(2.0f,0.2f,2.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
         }
 
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
 
-        RederingObj(&boxmodel, model, BOX);
+        RederingObj(&boxmodel, model_bunny, BOX);
 
         //if(LINE_collision(g_VirtualScene["bunny"], p_orig, p_end, model))
             //std::cout << "Colisao com coelho " << glfwGetTime() << std::endl;
         //colisão com o coelho:
-        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["bunny"], select_point, model))
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["bunny"], select_point, model_bunny))
         {
             std::cout << "Colisão com coelho " << glfwGetTime() << std::endl;
-            picked_bunny = true;
-            at_orig_coords = false;
+            g_VirtualScene["bunny"].picked_up = true;
+            g_VirtualScene["bunny"].at_orig_coords = false;
         }
 
-        // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
-        // passamos por todos os sistemas de coordenadas armazenados nas
-        // matrizes the_model, the_view, e the_projection; e escrevemos na tela
-        // as matrizes e pontos resultantes dessas transformações.
-        //glm::vec4 p_model(0.5f, 0.5f, 0.5f, 1.0f);
-        //TextRendering_ShowModelViewProjection(window, projection, view, model, p_model);
+
+        // CAIXA INTERATIVA
+        // Testa se está segurando a caixa
+        if(g_VirtualScene["box"].picked_up && glfwGetKey(window, GLFW_KEY_E)){
+            g_VirtualScene["box"].picked_up = false;
+        }
+
+        if(g_VirtualScene["box"].picked_up){
+            g_VirtualScene["box"].CoordX = select_point.x;
+            g_VirtualScene["box"].CoordY = select_point.y;
+            g_VirtualScene["box"].CoordZ = select_point.z;
+
+            model_box = Matrix_Translate(select_point.x,select_point.y,select_point.z) * Matrix_Scale(0.2f,0.2f,0.2f);
+        }
+        else if(!g_VirtualScene["box"].at_orig_coords && !g_VirtualScene["box"].picked_up){
+            model_box = Matrix_Translate(g_VirtualScene["box"].CoordX,0.0f,g_VirtualScene["box"].CoordZ) * Matrix_Scale(0.2f,0.2f,0.2f);
+        }
+        else{
+            model_box = Matrix_Translate(3.5f,0.0f,0.9f) * Matrix_Scale(0.2f,0.2f,0.2f);
+        }
+
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model_box));
+        glUniform1i(object_id_uniform, DEFAULT);
+        DrawVirtualObject("box");
+
+        // Box
+        //model = Matrix_Translate(3.5f,0.0f,0.9f) * Matrix_Scale(0.2f,0.2f,0.2f);
+        //RederingObj(&boxmodel, model_box, DEFAULT);
+
+        //colisão com a caixa:
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["box"], select_point, model_box))
+        {
+            std::cout << "Colisão com caixa " << glfwGetTime() << std::endl;
+            g_VirtualScene["box"].picked_up = true;
+            g_VirtualScene["box"].at_orig_coords = false;
+        }
+
+
+        /*
+        // Atualiza a posição do objeto, teste de intersecção p/ pegar objeto, atualiza matriz model
+        UpdateInteractiveObject(window, "bunny", model_bunny, select_point);
+
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model_bunny));
+        glUniform1i(object_id_uniform, BUNNY);
+        DrawVirtualObject("bunny");
+
+        // Atualiza a posição do objeto, teste de intersecção p/ pegar objeto, atualiza matriz model
+        UpdateInteractiveObject(window, "box", model_box, select_point);
+
+        // Box
+        //model = Matrix_Translate(3.5f,0.0f,0.9f) * Matrix_Scale(0.2f,0.2f,0.2f);
+        RederingObj(&boxmodel, model_box, DEFAULT);
+        */
 
         // Imprimimos na tela os ângulos de Euler que controlam a rotação do
         // terceiro cubo.
@@ -1451,8 +1518,8 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
     // parâmetros que definem a posição da câmera dentro da cena virtual.
     // Assim, temos que o usuário consegue controlar a câmera.
 
-    //if (g_LeftMouseButtonPressed)
-    //{
+    if (!g_RightMouseButtonPressed)//(g_LeftMouseButtonPressed)
+    {
         // Deslocamento do cursor do mouse em x e y de coordenadas de tela!
         float dx = xpos - g_LastCursorPosX;
         float dy = ypos - g_LastCursorPosY; //para inverter o movimento no eixo y
@@ -1477,7 +1544,7 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
         // cursor como sendo a última posição conhecida do cursor.
         g_LastCursorPosX = xpos;
         g_LastCursorPosY = ypos;
-    //}
+    }
 
     if (g_RightMouseButtonPressed)
     {
@@ -1486,8 +1553,11 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
         float dy = ypos - g_LastCursorPosY;
 
         // Atualizamos parâmetros da antebraço com os deslocamentos
-        g_ForearmAngleZ -= 0.01f*dx;
-        g_ForearmAngleX += 0.01f*dy;
+        //g_ForearmAngleZ -= 0.01f*dx;
+        //g_ForearmAngleX += 0.01f*dy;
+
+        g_VirtualScene["bunny"].AngleY -= 0.01f*dx;
+        g_VirtualScene["bunny"].AngleX += 0.01f*dy;
 
         // Atualizamos as variáveis globais para armazenar a posição atual do
         // cursor como sendo a última posição conhecida do cursor.
@@ -1952,3 +2022,38 @@ void RederingObj(ObjModel* models, glm::mat4 model, int mod)
     }
 }
 
+/*
+void UpdateInteractiveObject(GLFWwindow* window, const char *objname, glm::mat4& model, glm::vec4 select_point){
+    if(g_VirtualScene[objname].picked_up && glfwGetKey(window, GLFW_KEY_E)){
+        g_VirtualScene[objname].picked_up = false;
+    }
+
+    if(g_VirtualScene[objname].picked_up){
+        g_VirtualScene[objname].CoordX = select_point.x;
+        g_VirtualScene[objname].CoordY = select_point.y;
+        g_VirtualScene[objname].CoordZ = select_point.z;
+
+        model = Matrix_Translate(select_point.x,select_point.y,select_point.z) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+    }
+    else if(!g_VirtualScene[objname].at_orig_coords && !g_VirtualScene[objname].picked_up){
+        model = Matrix_Translate(g_VirtualScene[objname].CoordX,0.2f,g_VirtualScene[objname].CoordZ) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+    }
+    else{
+        model = Matrix_Translate(2.0f,0.2f,2.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+    }
+
+    //glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+    //glUniform1i(object_id_uniform, BUNNY);
+    //DrawVirtualObject(objname);
+
+    //if(LINE_collision(g_VirtualScene["bunny"], p_orig, p_end, model))
+        //std::cout << "Colisao com coelho " << glfwGetTime() << std::endl;
+    //colisão com o coelho:
+    if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene[objname], select_point, model))
+    {
+        std::cout << "Colisão com " << objname << "  " << glfwGetTime() << std::endl;
+        g_VirtualScene[objname].picked_up = true;
+        g_VirtualScene[objname].at_orig_coords = false;
+    }
+}
+*/

@@ -83,17 +83,21 @@ void main()
     // Vetor que define o sentido da câmera em relação ao ponto atual.
     vec4 v = normalize(camera_position - p);
 
+    // half vector - blinn-phong
     vec4 h = (l + v)/length(l + v);
 
     //para não ter que calcular multiplas vezes o produto interno de n e l:
     float dot_n_l = dot(n,l);
 
     // Vetor que define o sentido da reflexão especular ideal.
-    vec4 r = -l + 2*n*(dot_n_l);// PREENCHA AQUI o vetor de reflexão especular ideal
+    //vec4 r = -l + 2*n*(dot_n_l);// PREENCHA AQUI o vetor de reflexão especular ideal
 
-    vec4 r_flash = -pFlashlight + 2*n*(dot(n, pFlashlight));
+    // Vetor que define o sentido da reflexão especular ideal - lanterna.
+    //vec4 r_flash = -pFlashlight + 2*n*(dot(n, pFlashlight));
 
+    // half vector - mas em relação a lanterna - blinn-phong
     vec4 h_flash = (pFlashlight + v)/length(pFlashlight + v);
+
     // Parâmetros que definem as propriedades espectrais da superfície
     vec3 Kd; // Refletância difusa
     vec3 Ks; // Refletância especular
@@ -226,7 +230,8 @@ void main()
 
     // Termo especular utilizando o modelo de iluminação de Phong
     //vec3 phong_specular_term  = Ks * I * pow(max(0, dot(r, v)), q); // PREENCH AQUI o termo especular de Phong
-    // Termo especular utilizando o modelo de iluminação de Blin-Phong
+
+    // Termo especular utilizando o modelo de iluminação de Blinn-Phong
     vec3 phong_specular_term  = Ks * I * pow(max(0, dot(n, h)), q); // PREENCH AQUI o termo especular de Phong
 
 
@@ -238,7 +243,7 @@ void main()
     // Termo especular utilizando o modelo de iluminação de Phong
     //vec3 specular_flash  = Ks * Iflash * pow(max(0, dot(r_flash, v)), q); // PREENCH AQUI o termo especular de Phong
 
-    // Termo especular utilizando o modelo de iluminação de Blin-Phong
+    // Termo especular utilizando o modelo de iluminação de Blinn-Phong
     vec3 specular_flash  = Ks * Iflash * pow(max(0, dot(n, h_flash)), q); // PREENCH AQUI o termo especular de Phong
 
 

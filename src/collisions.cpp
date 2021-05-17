@@ -100,8 +100,7 @@ bool pointAABB_collision(const SceneObject& A, const glm::vec4 p, const glm::mat
     A_min = model * A_min;
     A_max = model * A_max;
 
-    //std::cout << p.x << " " << p.y << " " << p.z << "\n";
-    bool collision = (p.x >= A_min.x && p.x <= A_max.x) &&
+    bool collided = (p.x >= A_min.x && p.x <= A_max.x) &&
          (p.y >= A_min.y && p.y <= A_max.y) &&
          (p.z >= A_min.z && p.z <= A_max.z);
 
@@ -111,7 +110,7 @@ bool pointAABB_collision(const SceneObject& A, const glm::vec4 p, const glm::mat
         std::cout << "AABBPoint " << A.name << ": TRUE" << glfwGetTime() << "\n";
     }
 
-    return collision;
+    return collided;
 }
 
 // Fonte: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
@@ -122,7 +121,6 @@ bool pointAABB_collision2(const SceneObject& A, const glm::vec4 p, const glm::ma
     A_min = model * A_min;
     A_max = model * A_max;
 
-    //std::cout << p.x << " " << p.y << " " << p.z << "\n";
     //bool collided = (p[0] >= A_min.x && p[0] <= A_max.x) &&
          //(p[1] >= A_min.y && p[1] <= A_max.y) &&
          //(p[2] >= A_min.z && p[2] <= A_max.z);

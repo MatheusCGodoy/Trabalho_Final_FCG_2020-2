@@ -307,13 +307,13 @@ int main(int argc, char* argv[])
     ComputeNormals(&wallmodel);
     BuildTrianglesAndAddToVirtualScene(&wallmodel);
 
-    //ObjModel boxmodel("../../data/box.obj");
-    //ComputeNormals(&boxmodel);
-    //BuildTrianglesAndAddToVirtualScene(&boxmodel);
+    ObjModel boxmodel("../../data/box.obj");
+    ComputeNormals(&boxmodel);
+    BuildTrianglesAndAddToVirtualScene(&boxmodel);
 
-    //ObjModel light_switchmodel("../../data/light_switch.obj");
-    //ComputeNormals(&light_switchmodel);
-    //BuildTrianglesAndAddToVirtualScene(&light_switchmodel);
+    ObjModel light_switchmodel("../../data/light_switch.obj");
+    ComputeNormals(&light_switchmodel);
+    BuildTrianglesAndAddToVirtualScene(&light_switchmodel);
 
 
     if ( argc > 1 )
@@ -698,11 +698,11 @@ int main(int argc, char* argv[])
         RederingObj(&spheremodel, model, SPHERE);
 
 
-        //model = Matrix_Translate(3.5f,0.0f,0.9f) * Matrix_Scale(0.2f,0.2f,0.2f);
-        //RederingObj(&boxmodel, model, DEFAULT);
+        model = Matrix_Translate(3.5f,0.0f,0.9f) * Matrix_Scale(0.2f,0.2f,0.2f);
+        RederingObj(&boxmodel, model, DEFAULT);
 
-        //model = Matrix_Translate(1.0f,1.0f,3.0f) * Matrix_Rotate_Y(3.15) * Matrix_Translate(-1.0f,0.0f,-1.9f) * Matrix_Scale(0.03f,0.03f,0.03f);
-        //RederingObj(&light_switchmodel, model, LIGTHSWITCH);
+        model = Matrix_Translate(1.0f,1.0f,3.0f) * Matrix_Rotate_Y(3.15) * Matrix_Translate(-1.0f,0.0f,-1.9f) * Matrix_Scale(0.03f,0.03f,0.03f);
+        RederingObj(&light_switchmodel, model, LIGTHSWITCH);
 
         //glm::mat4 inverseModel =  Matrix_Scale(1/0.15f, 1/0.15f, 1/0.15f) * Matrix_Translate(-2.0f,-1.8f,-2.0f);
         //glm::vec4 vec_orig = camera_position_c * inverseModel;

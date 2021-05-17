@@ -350,6 +350,14 @@ int main(int argc, char* argv[])
     float dt = 0.0f;
     float time_prev = 0.0f;
 
+
+    //Dados do coelho:
+    bool picked_bunny = false;
+    bool at_orig_coords = true;
+    float bunnyCoordX = 2.0f;
+    float bunnyCoordY = 0.2f;
+    float bunnyCoordZ = 2.0f;
+
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
     {
@@ -596,6 +604,7 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(projection_uniform , 1 , GL_FALSE , glm::value_ptr(projection));
 
         #define SPHERE 0
+        #define BUNNY  1
         #define PLANE  2
 
 
@@ -629,15 +638,20 @@ int main(int argc, char* argv[])
             DrawVirtualObject("wall");
         }
 
-        glm::mat4 inverseModel =  Matrix_Scale(1.0f/1.0f, 1.0f/2.0f, 1.0f/1.0f) * Matrix_Translate(-0.0f,-0.0f,-2.0f);
-        glm::vec4 vec_orig = camera_position_c * inverseModel;
-        glm::vec4 vec_end = (camera_position_c + (camera_view_vector*100.0f))* inverseModel;
+        //glm::mat4 inverseModel =  Matrix_Scale(1.0f/1.0f, 1.0f/2.0f, 1.0f/1.0f) * Matrix_Translate(-0.0f,-0.0f,-2.0f);
+        //glm::vec4 vec_orig = camera_position_c * inverseModel;
+        //glm::vec4 vec_end = (camera_position_c + (camera_view_vector*100.0f))* inverseModel;
+        glm::vec4 p_orig = camera_position_c;
+        glm::vec4 p_end = camera_position_c + (camera_view_vector*0.2f);
 
-        if(LINE_collision(g_VirtualScene["wall"], vec_orig, vec_end))
-            std::cout << "Colisao com parede" << std::endl;
+        //if(LINE_collision(g_VirtualScene["wall"], p_orig, p_end, model))
+            //std::cout << "Colisao com parede " << glfwGetTime() <<std::endl;
 
+        glm::vec4 select_point = camera_position_c + (camera_view_vector*0.2f);
+        //if(pointAABB_collision(g_VirtualScene["wall"], select_point, model))
+            //std::cout << "Colisão com parede" << glfwGetTime() << std::endl;
 
-       for (float i = 0.0; i < 3; i++){
+        for (float i = 0.0; i < 3; i++){
             model = Matrix_Translate(4.00f,0.0f,(i * 2.00))  * Matrix_Scale(1.0f,2.0f,1.0f);
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(object_id_uniform, PLANE);
@@ -669,13 +683,53 @@ int main(int argc, char* argv[])
         //glm::mat4 inverseModel =  Matrix_Scale(1/0.15f, 1/0.15f, 1/0.15f) * Matrix_Translate(-2.0f,-1.8f,-2.0f);
         //glm::vec4 vec_orig = camera_position_c * inverseModel;
         //glm::vec4 vec_end = (camera_position_c + (camera_view_vector*5.0f))* inverseModel;
-        inverseModel =  Matrix_Scale(1.0f/0.15f, 1.0f/0.15f, 1.0f/0.15f) * Matrix_Translate(-2.0f,-1.8f,-2.0f);
-        vec_orig = camera_position_c * inverseModel;
-        vec_end = (camera_position_c + (camera_view_vector*100.0f))* inverseModel;
+        //inverseModel =  Matrix_Scale(1.0f/0.15f, 1.0f/0.15f, 1.0f/0.15f) * Matrix_Translate(-2.0f,-1.8f,-2.0f);
+        //vec_orig = camera_position_c * inverseModel;
+        //vec_end = (camera_position_c + (camera_view_vector*100.0f))* inverseModel;
 
-        if(LINE_collision(g_VirtualScene["sphere"], vec_orig, vec_end))
-            std::cout << "Colisao com esfera" << std::endl;
+        //if(LINE_collision(g_VirtualScene["sphere"], p_orig, p_end, model))
+            //std::cout << "Colisao com esfera " << glfwGetTime() << std::endl;
 
+        //select_point = camera_position_c + (camera_view_vector*0.2f);
+        //if(pointAABB_collision(g_VirtualScene["sphere"], select_point, model))
+            //std::cout << "Colisão com esfera" << glfwGetTime() << std::endl;
+
+        select_point = camera_position_c + (camera_view_vector*0.2f);
+
+        if(picked_bunny && glfwGetKey(window, GLFW_KEY_E)){
+            picked_bunny = false;
+        }
+
+        if(picked_bunny){
+            bunnyCoordX = select_point.x;
+            bunnyCoordY = select_point.y;
+            bunnyCoordZ = select_point.z;
+
+            model = Matrix_Translate(select_point.x,select_point.y,select_point.z)
+                  * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        }
+        else if(!at_orig_coords && !picked_bunny){
+            model = Matrix_Translate(bunnyCoordX,0.2f,bunnyCoordZ)
+                  * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        }
+        else{
+            model = Matrix_Translate(2.0f,0.2f,2.0f)
+                  * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        }
+
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, BUNNY);
+        DrawVirtualObject("bunny");
+
+        //if(LINE_collision(g_VirtualScene["bunny"], p_orig, p_end, model))
+            //std::cout << "Colisao com coelho " << glfwGetTime() << std::endl;
+        //colisão com o coelho:
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["bunny"], select_point, model))
+        {
+            std::cout << "Colisão com coelho " << glfwGetTime() << std::endl;
+            picked_bunny = true;
+            at_orig_coords = false;
+        }
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
         // passamos por todos os sistemas de coordenadas armazenados nas

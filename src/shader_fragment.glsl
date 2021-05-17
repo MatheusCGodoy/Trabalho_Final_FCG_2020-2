@@ -78,7 +78,7 @@ void main()
     bool not_under_light = dot(normalize(p - p_light), normalize(vec_light)) < cos(degrees_light); //um ponto p não é iluminado sse cos(b) < cos(a)
 
     // Vetor que define o sentido da fonte de luz (lanterna) em relação ao ponto atual.
-    vec4 pFlashlight = normalize(p_light - p);  // Luz "sai" da camera em direção ao ponto p
+    vec4 vFlashlight = normalize(p_light - p);  // Luz "sai" da camera em direção ao ponto p
 
     // Vetor que define o sentido da câmera em relação ao ponto atual.
     vec4 v = normalize(camera_position - p);
@@ -93,10 +93,10 @@ void main()
     //vec4 r = -l + 2*n*(dot_n_l);// PREENCHA AQUI o vetor de reflexão especular ideal
 
     // Vetor que define o sentido da reflexão especular ideal - lanterna.
-    //vec4 r_flash = -pFlashlight + 2*n*(dot(n, pFlashlight));
+    //vec4 r_flash = -vFlashlight + 2*n*(dot(n, vFlashlight));
 
     // half vector - mas em relação a lanterna - blinn-phong
-    vec4 h_flash = (pFlashlight + v)/length(pFlashlight + v);
+    vec4 h_flash = (vFlashlight + v)/length(vFlashlight + v);
 
     // Parâmetros que definem as propriedades espectrais da superfície
     vec3 Kd; // Refletância difusa
@@ -239,7 +239,7 @@ void main()
     //LANTERNA
     // Termo difuso utilizando a lei dos cossenos de Lambert
     //vec3 lambert_diffuse_term = vec3(0.0,0.0,0.0);
-    vec3 diffuse_flash = Kd * Iflash * max(0, dot(n, pFlashlight));// PREENCHA AQUI o termo difuso de Lambert
+    vec3 diffuse_flash = Kd * Iflash * max(0, dot(n, vFlashlight));// PREENCHA AQUI o termo difuso de Lambert
 
     // Termo especular utilizando o modelo de iluminação de Phong
     //vec3 specular_flash  = Ks * Iflash * pow(max(0, dot(r_flash, v)), q); // PREENCH AQUI o termo especular de Phong

@@ -27,6 +27,8 @@ uniform bool is_flashlight_on;
 #define WALL  2
 #define DEFAULT  3
 #define LIGTHSWITCH  4
+#define BOX 5
+#define BOXNORMAL 6
 
 uniform int object_id;
 
@@ -245,6 +247,43 @@ void main()
         Kd = Kdu;
         Ks = Ksu;
         q = 1.0;
+    } else if ( object_id == BOX ) {
+        // Coordenadas de textura do plano, obtidas do arquivo OBJ.
+        U = texcoords.x;
+        V = texcoords.y;
+
+        hasKD0 = true;
+        Kd0 = texture(TextureImage2, vec2(U,V)).rgb;
+
+        
+
+
+        // Propriedades espectrais do plano
+        //Kd = texture(TextureImage0, vec2(U,V)).rgb;
+        Ka = Kau;
+        Kd = Kdu;
+        Ks = Ksu;
+        q = 1.0;
+
+        if(is_flashlight_on && !not_under_light){
+            Kd = vec3(0.0,0.2,0.0);;
+        }
+    }
+    else if ( object_id == BOXNORMAL ) {
+        // Coordenadas de textura do plano, obtidas do arquivo OBJ.
+        U = texcoords.x;
+        V = texcoords.y;
+
+        hasKD0 = true;
+        Kd0 = texture(TextureImage2, vec2(U,V)).rgb;
+
+        // Propriedades espectrais do plano
+        //Kd = texture(TextureImage0, vec2(U,V)).rgb;
+        Ka = Kau;
+        Kd = Kdu;
+        Ks = Ksu;
+        q = 1.0;
+
     }
     else // Objeto desconhecido = preto
     {

@@ -122,6 +122,8 @@ void UpdateInteractiveObject(GLFWwindow* window, const char *objname, glm::mat4&
 #define WALL  2
 #define DEFAULT  3
 #define LIGTHSWITCH 4
+#define BOX 5   
+#define BOXNORMAL 6
 
 //#include "Objects.h"
 #include "collisions.h"
@@ -297,7 +299,7 @@ int main(int argc, char* argv[])
     // Carregamos as imagens para serem utilizadas como texturas
     LoadTextureImage("../../data/10121_Light_Switch_v1_Diffuse_SG.jpg");      // TextureImage0
     LoadTextureImage("../../data/wall.jpg"); // TextureImage1
-    LoadTextureImage("../../data/FuseBoxWall_NoAO.jpg");
+    LoadTextureImage("../../data/box.jpg");
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
     ObjModel spheremodel("../../data/sphere.obj");
@@ -319,6 +321,10 @@ int main(int argc, char* argv[])
     ObjModel boxmodel("../../data/box.obj");
     ComputeNormals(&boxmodel);
     BuildTrianglesAndAddToVirtualScene(&boxmodel);
+
+        ObjModel displaymodel("../../data/display.obj");
+    ComputeNormals(&displaymodel);
+    BuildTrianglesAndAddToVirtualScene(&displaymodel);
 
     ObjModel light_switchmodel("../../data/light_switch.obj");
     ComputeNormals(&light_switchmodel);
@@ -427,6 +433,16 @@ int main(int argc, char* argv[])
     float time_now = glfwGetTime();
     float dt = 0.0f;
     float time_prev = 0.0f;
+
+
+    //Dados do coelho:
+    bool picked_bunny = false;
+    bool at_orig_coords = true;
+    float bunnyCoordX = 2.0f;
+    float bunnyCoordY = 0.2f;
+    float bunnyCoordZ = 2.0f;
+
+    PrintObjModelInfo(&displaymodel);
 
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
@@ -735,12 +751,8 @@ int main(int argc, char* argv[])
         model = Matrix_Translate(2.0f,1.8f,2.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
         RederingObj(&spheremodel, model, SPHERE);
 
-        // Box
-        //model = Matrix_Translate(3.5f,0.0f,0.9f) * Matrix_Scale(0.2f,0.2f,0.2f);
-        RederingObj(&boxmodel, model_box, DEFAULT);
-
         // Lightswitch
-        model = Matrix_Translate(1.0f,1.0f,3.0f) * Matrix_Rotate_Y(3.15) * Matrix_Translate(-1.0f,0.0f,-1.9f) * Matrix_Scale(0.03f,0.03f,0.03f);
+        model = Matrix_Translate(1.0f,1.0f,3.0f) * Matrix_Rotate_Y(3.15) * Matrix_Translate(-1.0f,0.0f,-1.95f) * Matrix_Scale(0.03f,0.03f,0.03f);
         RederingObj(&light_switchmodel, model, LIGTHSWITCH);
 
         //glm::mat4 inverseModel =  Matrix_Scale(1/0.15f, 1/0.15f, 1/0.15f) * Matrix_Translate(-2.0f,-1.8f,-2.0f);
@@ -784,9 +796,9 @@ int main(int argc, char* argv[])
             model_bunny = Matrix_Translate(2.0f,0.2f,2.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
         }
 
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model_bunny));
-        glUniform1i(object_id_uniform, BUNNY);
-        DrawVirtualObject("bunny");
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+
+        RederingObj(&boxmodel, model_bunny, BOX);
 
         //if(LINE_collision(g_VirtualScene["bunny"], p_orig, p_end, model))
             //std::cout << "Colisao com coelho " << glfwGetTime() << std::endl;
@@ -819,9 +831,9 @@ int main(int argc, char* argv[])
             model_box = Matrix_Translate(3.5f,0.0f,0.9f) * Matrix_Scale(0.2f,0.2f,0.2f);
         }
 
-        //glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model_box));
-        //glUniform1i(object_id_uniform, DEFAULT);
-        //DrawVirtualObject("box");
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model_box));
+        glUniform1i(object_id_uniform, DEFAULT);
+        DrawVirtualObject("box");
 
         // Box
         //model = Matrix_Translate(3.5f,0.0f,0.9f) * Matrix_Scale(0.2f,0.2f,0.2f);

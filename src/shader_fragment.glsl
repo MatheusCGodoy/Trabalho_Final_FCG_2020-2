@@ -198,7 +198,7 @@ void main()
         // Propriedades espectrais do coelho
         //Kd = vec3(0.08,0.4,0.8);
         Ks = vec3(0.8,0.8,0.8);
-        Ka = vec3(0.01,0.01,0.01);
+        Ka = vec3(0.04,0.04,0.04);
         //q = 32.0; //phong
         q = 80; //blinn-phong
     }
@@ -261,7 +261,7 @@ void main()
     vec3 I = vec3(1.0f,1.0f,1.0f);
 
     // Espectro da luz ambiente
-    vec3 Ia = vec3(0.5f,0.5f,0.5f);
+    vec3 Ia = vec3(0.2f,0.2f,0.2f);//vec3(0.5f,0.5f,0.5f);
 
     // Termo difuso utilizando a lei dos cossenos de Lambert
     //vec3 lambert_diffuse_term = vec3(0.0,0.0,0.0);

@@ -20,4 +20,12 @@ struct SceneObject
     GLuint       vertex_array_object_id; // ID do VAO onde est�o armazenados os atributos do modelo
     glm::vec3    bbox_min; // Axis-Aligned Bounding Box do objeto
     glm::vec3    bbox_max;
+
+    bool picked_up = false;
+    bool at_orig_coords = true;
+    float CoordX;
+    float CoordY;
+    float CoordZ;
+    float AngleX;
+    float AngleY;
 };

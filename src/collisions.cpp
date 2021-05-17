@@ -106,7 +106,7 @@ bool pointAABB_collision(const SceneObject& A, const glm::vec4 p, const glm::mat
 
 
     std::cout << (p.x >= A_min.x && p.x <= A_max.x) << " " << (p.y >= A_min.y && p.y <= A_max.y) << " " << (p.z >= A_min.z && p.z <= A_max.z) << "\n";
-    if (collision){
+    if (collided){
         std::cout << "AABBPoint " << A.name << ": TRUE" << glfwGetTime() << "\n";
     }
 

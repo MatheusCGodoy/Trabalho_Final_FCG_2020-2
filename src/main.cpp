@@ -120,6 +120,8 @@ void RederingObj(ObjModel* models, glm::mat4 model, int mod);
 #define WALL  2
 #define DEFAULT  3
 #define LIGTHSWITCH 4
+#define BOX 5   
+#define BOXNORMAL 6
 
 //#include "Objects.h"
 #include "collisions.h"
@@ -288,7 +290,7 @@ int main(int argc, char* argv[])
     // Carregamos as imagens para serem utilizadas como texturas
     LoadTextureImage("../../data/10121_Light_Switch_v1_Diffuse_SG.jpg");      // TextureImage0
     LoadTextureImage("../../data/wall.jpg"); // TextureImage1
-    LoadTextureImage("../../data/FuseBoxWall_NoAO.jpg");
+    LoadTextureImage("../../data/box.jpg");
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
     ObjModel spheremodel("../../data/sphere.obj");
@@ -307,9 +309,9 @@ int main(int argc, char* argv[])
     ComputeNormals(&wallmodel);
     BuildTrianglesAndAddToVirtualScene(&wallmodel);
 
-    //ObjModel boxmodel("../../data/box.obj");
-    //ComputeNormals(&boxmodel);
-    //BuildTrianglesAndAddToVirtualScene(&boxmodel);
+    ObjModel boxmodel("../../data/box.obj");
+    ComputeNormals(&boxmodel);
+    BuildTrianglesAndAddToVirtualScene(&boxmodel);
 
     //ObjModel light_switchmodel("../../data/light_switch.obj");
     //ComputeNormals(&light_switchmodel);
@@ -686,8 +688,44 @@ int main(int argc, char* argv[])
         RederingObj(&spheremodel, model, SPHERE);
 
 
-        //model = Matrix_Translate(3.5f,0.0f,0.9f) * Matrix_Scale(0.2f,0.2f,0.2f);
-        //RederingObj(&boxmodel, model, DEFAULT);
+        model = Matrix_Translate(3.5f,0.0f,0.0f) * Matrix_Scale(0.2f,0.5f,0.2f);
+        RederingObj(&boxmodel, model, BOXNORMAL);
+
+        model = Matrix_Translate(3.5f,0.0f,1.5f) * Matrix_Scale(0.2f,0.5f,0.2f);
+        RederingObj(&boxmodel, model, BOXNORMAL);
+
+        model = Matrix_Translate(3.5f,0.0f,3.0f) * Matrix_Scale(0.2f,0.5f,0.2f);
+        RederingObj(&boxmodel, model, BOX);
+
+        model = Matrix_Translate(3.5f,0.0f,4.5f) * Matrix_Scale(0.2f,0.5f,0.2f);
+        RederingObj(&boxmodel, model, BOXNORMAL);
+
+        
+        model = Matrix_Translate(2.5f,0.0f,0.0f) * Matrix_Scale(0.2f,0.5f,0.2f);
+        RederingObj(&boxmodel, model, BOXNORMAL);
+
+        model = Matrix_Translate(2.5f,0.0f,1.5f) * Matrix_Scale(0.2f,0.5f,0.2f);
+        RederingObj(&boxmodel, model, BOXNORMAL);
+
+        model = Matrix_Translate(2.5f,0.0f,3.0f) * Matrix_Scale(0.2f,0.5f,0.2f);
+        RederingObj(&boxmodel, model, BOXNORMAL);
+
+        model = Matrix_Translate(2.5f,0.0f,4.5f) * Matrix_Scale(0.2f,0.5f,0.2f);
+        RederingObj(&boxmodel, model, BOX);
+
+        
+        model = Matrix_Translate(1.5f,0.0f,0.0f) * Matrix_Scale(0.2f,0.5f,0.2f);
+        RederingObj(&boxmodel, model, BOXNORMAL);
+
+        model = Matrix_Translate(1.5f,0.0f,1.5f) * Matrix_Scale(0.2f,0.5f,0.2f);
+        RederingObj(&boxmodel, model, BOX);
+
+        model = Matrix_Translate(1.5f,0.0f,3.0f) * Matrix_Scale(0.2f,0.5f,0.2f);
+        RederingObj(&boxmodel, model, BOXNORMAL);
+
+        model = Matrix_Translate(1.5f,0.0f,4.5f) * Matrix_Scale(0.2f,0.5f,0.2f);
+        RederingObj(&boxmodel, model, BOXNORMAL);
+
 
         //model = Matrix_Translate(1.0f,1.0f,3.0f) * Matrix_Rotate_Y(3.15) * Matrix_Translate(-1.0f,0.0f,-1.9f) * Matrix_Scale(0.03f,0.03f,0.03f);
         //RederingObj(&light_switchmodel, model, LIGTHSWITCH);
@@ -731,7 +769,7 @@ int main(int argc, char* argv[])
 
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, BUNNY);
-        DrawVirtualObject("bunny");
+        DrawVirtualObject("box");
 
         //if(LINE_collision(g_VirtualScene["bunny"], p_orig, p_end, model))
             //std::cout << "Colisao com coelho " << glfwGetTime() << std::endl;

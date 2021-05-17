@@ -27,6 +27,8 @@ uniform bool is_flashlight_on;
 #define WALL  2
 #define DEFAULT  3
 #define LIGTHSWITCH  4
+#define BOX 5
+#define BOXNORMAL 6
 
 uniform int object_id;
 
@@ -245,6 +247,43 @@ void main()
         Kd = Kdu;
         Ks = Ksu;
         q = 1.0;
+    } else if ( object_id == BOX ) {
+        // Coordenadas de textura do plano, obtidas do arquivo OBJ.
+        U = texcoords.x;
+        V = texcoords.y;
+
+        hasKD0 = true;
+        Kd0 = texture(TextureImage2, vec2(U,V)).rgb;
+
+        
+
+
+        // Propriedades espectrais do plano
+        //Kd = texture(TextureImage0, vec2(U,V)).rgb;
+        Ka = Kau;
+        Kd = Kdu;
+        Ks = Ksu;
+        q = 1.0;
+
+        if(is_flashlight_on && !not_under_light){
+            Kd = vec3(0.0,0.2,0.0);;
+        }
+    }
+    else if ( object_id == BOXNORMAL ) {
+        // Coordenadas de textura do plano, obtidas do arquivo OBJ.
+        U = texcoords.x;
+        V = texcoords.y;
+
+        hasKD0 = true;
+        Kd0 = texture(TextureImage2, vec2(U,V)).rgb;
+
+        // Propriedades espectrais do plano
+        //Kd = texture(TextureImage0, vec2(U,V)).rgb;
+        Ka = Kau;
+        Kd = Kdu;
+        Ks = Ksu;
+        q = 1.0;
+
     }
     else // Objeto desconhecido = preto
     {
@@ -258,10 +297,10 @@ void main()
     vec3 Iflash = vec3(1.0f,1.0f,1.0f);
 
     // Espectro da fonte de iluminação
-    vec3 I = vec3(1.0f,1.0f,1.0f);
+    vec3 I = vec3(0.0f,0.0f,0.0f);
 
     // Espectro da luz ambiente
-    vec3 Ia = vec3(0.5f,0.5f,0.5f);
+    vec3 Ia = vec3(0.0f,0.0f,0.0f);
 
     // Termo difuso utilizando a lei dos cossenos de Lambert
     //vec3 lambert_diffuse_term = vec3(0.0,0.0,0.0);

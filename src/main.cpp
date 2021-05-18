@@ -320,9 +320,9 @@ int main(int argc, char* argv[])
     ComputeNormals(&displaymodel);
     BuildTrianglesAndAddToVirtualScene(&displaymodel);
 
-    //ObjModel light_switchmodel("../../data/light_switch.obj");
-    //ComputeNormals(&light_switchmodel);
-    //BuildTrianglesAndAddToVirtualScene(&light_switchmodel);
+    ObjModel light_switchmodel("../../data/light_switch.obj");
+    ComputeNormals(&light_switchmodel);
+    BuildTrianglesAndAddToVirtualScene(&light_switchmodel);
 
     ObjModel cow("../../data/cow.obj");
     ComputeNormals(&cow);
@@ -437,6 +437,9 @@ int main(int argc, char* argv[])
 
     //COW
     glm::mat4 model_cow = Matrix_Translate(0.5f,0.2f,-0.5f) * Matrix_Scale(0.2f, 0.2f, 0.2f);
+
+    //Lightswitch
+    glm::mat4 model_lswitch = Matrix_Translate(2.9f,0.7f,4.95f)* Matrix_Rotate_X(3.14) * Matrix_Scale(0.2f,0.2f,0.2f);
 
     //Medição do tempo a cada frame
     float time_now = glfwGetTime();
@@ -668,13 +671,6 @@ int main(int argc, char* argv[])
             glUniform1i(is_flashlight_on, true);
         }
 
-        if(flashlightambient_on){
-            glUniform1i(is_flashlightambient_on, false);
-        }
-        else{
-            glUniform1i(is_flashlightambient_on, true);
-        }
-
 
         // Agora computamos a matriz de Projeção.
         glm::mat4 projection;
@@ -726,8 +722,8 @@ int main(int argc, char* argv[])
         //glm::mat4 inverseModel =  Matrix_Scale(1.0f/1.0f, 1.0f/2.0f, 1.0f/1.0f) * Matrix_Translate(-0.0f,-0.0f,-2.0f);
         //glm::vec4 vec_orig = camera_position_c * inverseModel;
         //glm::vec4 vec_end = (camera_position_c + (camera_view_vector*100.0f))* inverseModel;
-        glm::vec4 p_orig = camera_position_c;
-        glm::vec4 p_end = camera_position_c + (camera_view_vector*0.2f);
+        //glm::vec4 p_orig = camera_position_c;
+        //glm::vec4 p_end = camera_position_c + (camera_view_vector*0.2f);
 
 
         //select_point = camera_position_c + (camera_view_vector*0.2f);
@@ -755,14 +751,17 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, WALL);
         DrawVirtualObject("wall");
 
+        //Lightswitch
+        //model = Matrix_Translate(2.9f,0.7f,4.95f)* Matrix_Rotate_X(3.14) * Matrix_Scale(0.2f,0.2f,0.2f);
+        RederingObj(&light_switchmodel, model_lswitch, DEFAULT);
 
         // Lightbulb
         model = Matrix_Translate(2.0f,1.8f,2.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
         RederingObj(&spheremodel, model, SPHERE);
 
         // Display
-        model = Matrix_Translate(0.9f,0.5f,4.95f) * Matrix_Scale(0.2f,0.2f,0.2f);
-        RederingObj(&displaymodel, model, DEFAULT);
+        glm::mat4 model_display = Matrix_Translate(0.9f,0.5f,4.95f) * Matrix_Scale(0.2f,0.2f,0.2f);
+        RederingObj(&displaymodel, model_display, DEFAULT);
 
         //glm::mat4 inverseModel =  Matrix_Scale(1/0.15f, 1/0.15f, 1/0.15f) * Matrix_Translate(-2.0f,-1.8f,-2.0f);
         //glm::vec4 vec_orig = camera_position_c * inverseModel;
@@ -781,10 +780,6 @@ int main(int argc, char* argv[])
         // Ponto de seleção - usado para pegar os objetos - teste de intersecção
         select_point = camera_position_c + (camera_view_vector*0.2f);
 
-
-        // Lightswitch
-/*         model = Matrix_Translate(1.0f,1.0f,3.0f) * Matrix_Rotate_Y(3.15) * Matrix_Translate(-1.0f,0.0f,-1.95f) * Matrix_Scale(0.03f,0.03f,0.03f);
-        RederingObj(&light_switchmodel, model, LIGTHSWITCH); */
 
         // Testa se está segurando o coelho
         if(g_VirtualScene["bunny"].picked_up && glfwGetKey(window, GLFW_KEY_E)){
@@ -817,7 +812,7 @@ int main(int argc, char* argv[])
         //colisão com o coelho:
         if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["bunny"], select_point, model_bunny))
         {
-            std::cout << "Colisão com coelho " << glfwGetTime() << std::endl;
+            std::cout << "Colisao com coelho " << glfwGetTime() << std::endl;
             g_VirtualScene["bunny"].picked_up = true;
             g_VirtualScene["bunny"].at_orig_coords = false;
         }
@@ -855,7 +850,7 @@ int main(int argc, char* argv[])
         //colisão com a caixa:
         if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["box"], select_point, model_box))
         {
-            std::cout << "Colisão com coelho " << glfwGetTime() << std::endl;
+            std::cout << "Colisao com a caixa " << glfwGetTime() << std::endl;
             g_VirtualScene["box"].picked_up = true;
             g_VirtualScene["box"].at_orig_coords = false;
         }
@@ -892,7 +887,7 @@ int main(int argc, char* argv[])
         //colisão com a vaca:
         if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["cow"], select_point, model_cow))
         {
-            std::cout << "Colisão com coelho " << glfwGetTime() << std::endl;
+            std::cout << "Colisao com a vaca " << glfwGetTime() << std::endl;
             g_VirtualScene["cow"].picked_up = true;
             g_VirtualScene["cow"].at_orig_coords = false;
         }
@@ -908,6 +903,30 @@ int main(int argc, char* argv[])
                g_VirtualScene["cow"].bbox_min.y, g_VirtualScene["cow"].bbox_min.z);
         */
 
+
+        //##### Colisão LIGHTSWITCH #########
+        if(glfwGetKey(window, GLFW_KEY_E) && !flashlightambient_on && pointAABB_collision2(g_VirtualScene["display"], select_point, model_display)){
+            flashlightambient_on = true;
+        }
+        else if(glfwGetKey(window, GLFW_KEY_E) && flashlightambient_on && pointAABB_collision2(g_VirtualScene["display"], select_point, model_display)){
+            flashlightambient_on = false;
+        }
+
+        if(flashlightambient_on){
+            glUniform1i(is_flashlightambient_on, true);
+        }
+        else{
+            glUniform1i(is_flashlightambient_on, false);
+        }
+
+         //printf("bbox_light: max= %f %f %f | min= %f %f %f \n", g_VirtualScene["light_switch"].bbox_max.x,
+         //      g_VirtualScene["light_switch"].bbox_max.y, g_VirtualScene["light_switch"].bbox_max.z, g_VirtualScene["light_switch"].bbox_min.x,
+         //      g_VirtualScene["light_switch"].bbox_min.y, g_VirtualScene["light_switch"].bbox_min.z);
+
+        // #### Colisão Botões do Painel (senha) ####
+        //if(glfwGetKey(window, GLFW_KEY_E) && !flashlightambient_on && pointAABB_collision2(g_VirtualScene[""], select_point, model_lswitch)){
+            //code[i] = ;
+        //}
 
 
         /*

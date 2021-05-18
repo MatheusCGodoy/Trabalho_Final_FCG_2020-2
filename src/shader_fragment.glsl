@@ -233,7 +233,7 @@ void main()
         Ka = Kau;
         Kd = Kdu;
         Ks = Ksu;
-        q = 1.0;
+        q = 90.0;
     }
     else if ( object_id == LIGTHSWITCH ) {
         // Coordenadas de textura do plano, obtidas do arquivo OBJ.
@@ -265,7 +265,7 @@ void main()
         Ka = Kau;
         Kd = Kdu;
         Ks = Ksu;
-        q = 1.0;
+        q = 50.0;
 
         if(is_flashlight_on && !not_under_light){
             Kd = vec3(0.0,0.2,0.0);;
@@ -307,10 +307,10 @@ void main()
     // Espectro da fonte de iluminação
     vec3 I = vec3(1.0f,1.0f,1.0f);
 
-    float light_ambient = 0.0;
+    float lswitch = 0.0;
 
     if(is_flashlightambient_on){
-        light_ambient = 1.0;
+        lswitch = 1.0;
     }
 
 
@@ -319,16 +319,16 @@ void main()
 
     // Termo difuso utilizando a lei dos cossenos de Lambert
     //vec3 lambert_diffuse_term = vec3(0.0,0.0,0.0);
-    vec3 lambert_diffuse_term = Kd * I * max(0, dot_n_l) * light_ambient;// PREENCHA AQUI o termo difuso de Lambert
+    vec3 lambert_diffuse_term = Kd * I * max(0, dot_n_l) * lswitch;// PREENCHA AQUI o termo difuso de Lambert
 
     // Termo ambiente
-    vec3 ambient_term = Ka * Ia * light_ambient * light_ambient;
+    vec3 ambient_term = Ka * Ia * lswitch;
 
     // Termo especular utilizando o modelo de iluminação de Phong
     //vec3 phong_specular_term  = Ks * I * pow(max(0, dot(r, v)), q); // PREENCH AQUI o termo especular de Phong
 
     // Termo especular utilizando o modelo de iluminação de Blinn-Phong
-    vec3 phong_specular_term  = Ks * I * pow(max(0, dot(n, h)), q) * light_ambient; // PREENCH AQUI o termo especular de Phong
+    vec3 phong_specular_term  = Ks * I * pow(max(0, dot(n, h)), q) * lswitch; // PREENCH AQUI o termo especular de Phong
 
 
     //LANTERNA
@@ -347,7 +347,7 @@ void main()
     if(dist_to_p < 0.7f)
         dist_to_p = 0.7f;
 
-    float lswitch = 1.0f; // luz direcional está ligada ou não
+    //float lswitch = 1.0f; // luz direcional está ligada ou não
     float intensity = (10.0f/(dist_to_p*dist_to_p))*max(abs(dot(normalize(p - p_light), normalize(vec_light)) - cos(degrees_light)),0);//abs(dot(normalize(p - p_light), normalize(vec_light)) - cos(degrees_light)); //1.0f
 
     if(!is_flashlight_on)
@@ -362,9 +362,9 @@ void main()
     // Cor final do fragmento calculada com uma combinação dos termos difuso,
     // especular, e ambiente. Veja slide 129 do documento Aula_17_e_18_Modelos_de_Iluminacao.pdf.
     if (hasKD0){
-        color = Kd0 * lswitch*(lambert_diffuse_term + phong_specular_term + ambient_term) + intensity*(diffuse_flash + specular_flash);
+        color = Kd0 * (lambert_diffuse_term + phong_specular_term + ambient_term) + intensity*(diffuse_flash + specular_flash);
     } else {
-        color = lswitch*(lambert_diffuse_term + phong_specular_term + ambient_term) + intensity*(diffuse_flash + specular_flash);
+        color = lambert_diffuse_term + phong_specular_term + ambient_term + intensity*(diffuse_flash + specular_flash);
     }
 
     // Cor final com correção gamma, considerando monitor sRGB.

@@ -101,7 +101,6 @@ void TextRendering_PrintMatrixVectorProductDivW(GLFWwindow* window, glm::mat4 M,
 // Funções abaixo renderizam como texto na janela OpenGL algumas matrizes e
 // outras informações do programa. Definidas após main().
 void TextRendering_ShowModelViewProjection(GLFWwindow* window, glm::mat4 projection, glm::mat4 view, glm::mat4 model, glm::vec4 p_model);
-void TextRendering_ShowEulerAngles(GLFWwindow* window);
 void TextRendering_ShowFramesPerSecond(GLFWwindow* window);
 
 // Funções callback para comunicação com o sistema operacional e interação do
@@ -116,7 +115,7 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 int ValidatePosition(glm::vec4 position);
 void RederingObj(ObjModel* models, glm::mat4 model, int mod);
 
-void UpdateInteractiveObject(GLFWwindow* window, const char *objname, glm::mat4& model, glm::vec4 select_point);
+//void UpdateInteractiveObject(GLFWwindow* window, const char *objname, glm::mat4& model, glm::vec4 select_point);
 
 #define SPHERE 0
 #define BUNNY  1
@@ -218,14 +217,6 @@ GLuint g_NumLoadedTextures = 0;
 GLint Ka_uniform;
 GLint Kd_uniform;
 GLint Ks_uniform;
-
-
-//Dados do coelho:
-//bool picked_bunny = false;
-//bool at_orig_coords = true;
-//float bunnyCoordX = 2.0f;
-//float bunnyCoordY = 0.2f;
-//float bunnyCoordZ = 2.0f;
 
 
 //################# MAIN #######################
@@ -348,6 +339,10 @@ int main(int argc, char* argv[])
     ComputeNormals(&cow);
     BuildTrianglesAndAddToVirtualScene(&cow);
 
+    ObjModel button("../../data/button.obj");
+    ComputeNormals(&button);
+    BuildTrianglesAndAddToVirtualScene(&button);
+
 
     if ( argc > 1 )
     {
@@ -458,6 +453,9 @@ int main(int argc, char* argv[])
     //COW
     glm::mat4 model_cow = Matrix_Translate(0.5f,0.2f,-0.5f) * Matrix_Scale(0.2f, 0.2f, 0.2f);
 
+    //Lightswitch
+    glm::mat4 model_lswitch = Matrix_Translate(2.9f,0.7f,4.95f)* Matrix_Rotate_X(3.14) * Matrix_Scale(0.2f,0.2f,0.2f);
+
     //Medição do tempo a cada frame
     float time_now = glfwGetTime();
     float dt = 0.0f;
@@ -465,6 +463,11 @@ int main(int argc, char* argv[])
 
 
     PrintObjModelInfo(&displaymodel);
+
+    //para o código
+    char code[3] = {'0', '0', '0'};
+    char password[3] = {'0', '0', '0'};//{'5', '2', '9'};
+    int i = 0;
 
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
@@ -688,13 +691,6 @@ int main(int argc, char* argv[])
             glUniform1i(is_flashlight_on, true);
         }
 
-        if(flashlightambient_on){
-            glUniform1i(is_flashlightambient_on, false);
-        }
-        else{
-            glUniform1i(is_flashlightambient_on, true);
-        }
-
 
         // Agora computamos a matriz de Projeção.
         glm::mat4 projection;
@@ -741,11 +737,11 @@ int main(int argc, char* argv[])
         //glm::mat4 inverseModel =  Matrix_Scale(1.0f/1.0f, 1.0f/2.0f, 1.0f/1.0f) * Matrix_Translate(-0.0f,-0.0f,-2.0f);
         //glm::vec4 vec_orig = camera_position_c * inverseModel;
         //glm::vec4 vec_end = (camera_position_c + (camera_view_vector*100.0f))* inverseModel;
-        glm::vec4 p_orig = camera_position_c;
-        glm::vec4 p_end = camera_position_c + (camera_view_vector*0.2f);
+        //glm::vec4 p_orig = camera_position_c;
+        //glm::vec4 p_end = camera_position_c + (camera_view_vector*0.2f);
 
 
-        select_point = camera_position_c + (camera_view_vector*0.2f);
+        //select_point = camera_position_c + (camera_view_vector*0.2f);
         //if(pointAABB_collision(g_VirtualScene["wall"], select_point, model_parede1))
             //std::cout << "Colisão com parede" << glfwGetTime() << std::endl;
 
@@ -770,17 +766,54 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, WALL);
         DrawVirtualObject("wall");
 
-         //Lightswitch
-        model = Matrix_Translate(2.9f,0.7f,4.95f)* Matrix_Rotate_X(3.14) * Matrix_Scale(0.2f,0.2f,0.2f);
-        RederingObj(&light_switchmodel, model, DEFAULT);
+        //Lightswitch
+        //model = Matrix_Translate(2.9f,0.7f,4.95f)* Matrix_Rotate_X(3.14) * Matrix_Scale(0.2f,0.2f,0.2f);
+        RederingObj(&light_switchmodel, model_lswitch, DEFAULT);
 
         // Lightbulb
         model = Matrix_Translate(2.0f,1.8f,2.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
         RederingObj(&spheremodel, model, SPHERE);
 
         // Display
-        model = Matrix_Translate(0.9f,0.5f,4.95f) * Matrix_Scale(0.2f,0.2f,0.2f);
-        RederingObj(&displaymodel, model, DEFAULT);
+        //glm::model_display = Matrix_Translate(0.9f,0.5f,4.95f) * Matrix_Scale(0.2f,0.2f,0.2f);
+        //RederingObj(&displaymodel, model_display, DEFAULT);
+
+        float size_bt = 0.05f;
+        //Botão 1
+        glm::mat4 model_button1 = Matrix_Translate(0.55f,0.75f,4.95f) * Matrix_Scale(size_bt,size_bt,size_bt);
+        RederingObj(&button, model_button1, DEFAULT);
+
+        //Botão 2
+        glm::mat4 model_button2 = Matrix_Translate(0.7f,0.75f,4.95f) * Matrix_Scale(size_bt,size_bt,size_bt);
+        RederingObj(&button, model_button2, DEFAULT);
+
+        //Botão 3
+        glm::mat4 model_button3 = Matrix_Translate(0.85f,0.75f,4.95f) * Matrix_Scale(size_bt,size_bt,size_bt);
+        RederingObj(&button, model_button3, DEFAULT);
+
+        //Botão 4
+        glm::mat4 model_button4 = Matrix_Translate(0.55f,0.6f,4.95f) * Matrix_Scale(size_bt,size_bt,size_bt);
+        RederingObj(&button, model_button4, DEFAULT);
+
+        //Botão 5
+        glm::mat4 model_button5 = Matrix_Translate(0.7f,0.6f,4.95f) * Matrix_Scale(size_bt,size_bt,size_bt);
+        RederingObj(&button, model_button5, DEFAULT);
+
+        //Botão 6
+        glm::mat4 model_button6 = Matrix_Translate(0.85f,0.6f,4.95f) * Matrix_Scale(size_bt,size_bt,size_bt);
+        RederingObj(&button, model_button6, DEFAULT);
+
+        //Botão 7
+        glm::mat4 model_button7 = Matrix_Translate(0.55f,0.45f,4.95f) * Matrix_Scale(size_bt,size_bt,size_bt);
+        RederingObj(&button, model_button7, DEFAULT);
+
+        //Botão 8
+        glm::mat4 model_button8 = Matrix_Translate(0.7f,0.45f,4.95f) * Matrix_Scale(size_bt,size_bt,size_bt);
+        RederingObj(&button, model_button8, DEFAULT);
+
+        //Botão 9
+        glm::mat4 model_button9 = Matrix_Translate(0.85f,0.45f,4.95f) * Matrix_Scale(size_bt,size_bt,size_bt);
+        RederingObj(&button, model_button9, DEFAULT);
 
         //glm::mat4 inverseModel =  Matrix_Scale(1/0.15f, 1/0.15f, 1/0.15f) * Matrix_Translate(-2.0f,-1.8f,-2.0f);
         //glm::vec4 vec_orig = camera_position_c * inverseModel;
@@ -798,7 +831,6 @@ int main(int argc, char* argv[])
 
         // Ponto de seleção - usado para pegar os objetos - teste de intersecção
         select_point = camera_position_c + (camera_view_vector*0.2f);
-
 
 
         // Testa se está segurando o coelho
@@ -851,7 +883,7 @@ int main(int argc, char* argv[])
         //colisão com o coelho:
         if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["bunny"], select_point, model_bunny))
         {
-            std::cout << "Colisão com coelho " << glfwGetTime() << std::endl;
+            std::cout << "Colisao com coelho " << glfwGetTime() << std::endl;
             g_VirtualScene["bunny"].picked_up = true;
             g_VirtualScene["bunny"].at_orig_coords = false;
         }
@@ -913,7 +945,7 @@ int main(int argc, char* argv[])
         //colisão com a caixa:
         if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["box"], select_point, model_box))
         {
-            std::cout << "Colisão com coelho " << glfwGetTime() << std::endl;
+            std::cout << "Colisao com a caixa " << glfwGetTime() << std::endl;
             g_VirtualScene["box"].picked_up = true;
             g_VirtualScene["box"].at_orig_coords = false;
         }
@@ -977,7 +1009,7 @@ int main(int argc, char* argv[])
         //colisão com a vaca:
         if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["cow"], select_point, model_cow))
         {
-            std::cout << "Colisão com coelho " << glfwGetTime() << std::endl;
+            std::cout << "Colisao com a vaca " << glfwGetTime() << std::endl;
             g_VirtualScene["cow"].picked_up = true;
             g_VirtualScene["cow"].at_orig_coords = false;
         }
@@ -994,6 +1026,75 @@ int main(int argc, char* argv[])
         */
 
 
+        //##### LIGHTSWITCH #########
+        /*if(glfwGetKey(window, GLFW_KEY_E) && !flashlightambient_on && pointAABB_collision2(g_VirtualScene["light_switch"], select_point, model_lswitch)){
+            flashlightambient_on = true;
+        }
+        else if(glfwGetKey(window, GLFW_KEY_E) && flashlightambient_on && pointAABB_collision2(g_VirtualScene["light_switch"], select_point, model_lswitch)){
+            flashlightambient_on = false;
+        }*/
+
+        if(flashlightambient_on){
+            glUniform1i(is_flashlightambient_on, true);
+        }
+        else{
+            glUniform1i(is_flashlightambient_on, false);
+        }
+
+        //model_button1
+        // #### Botões para a senha ####
+        if(glfwGetKey(window, GLFW_KEY_E) == GLFW_REPEAT && pointAABB_collision2(g_VirtualScene["button"], select_point, model_button1)){
+            code[i] = '1';
+            i++;
+        }
+        if(glfwGetKey(window, GLFW_KEY_E) == GLFW_REPEAT && pointAABB_collision2(g_VirtualScene["button"], select_point, model_button2)){
+            code[i] = '2';
+            i++;
+        }
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["button"], select_point, model_button3)){
+            code[i] = '3';
+            i++;
+        }
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["button"], select_point, model_button4)){
+            code[i] = '4';
+            i++;
+        }
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["button"], select_point, model_button5)){
+            code[i] = '5';
+            i++;
+        }
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["button"], select_point, model_button6)){
+            code[i] = '6';
+            i++;
+        }
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["button"], select_point, model_button7)){
+            code[i] = '7';
+            i++;
+        }
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["button"], select_point, model_button8)){
+            code[i] = '8';
+            i++;
+        }
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["button"], select_point, model_button9)){
+            code[i] = '9';
+            i++;
+        }
+        if(i > 3 && strcmp(code, password)){
+            return 100;
+        }
+        else
+            i = 0;
+
+         //printf("bbox_light: max= %f %f %f | min= %f %f %f \n", g_VirtualScene["light_switch"].bbox_max.x,
+         //      g_VirtualScene["light_switch"].bbox_max.y, g_VirtualScene["light_switch"].bbox_max.z, g_VirtualScene["light_switch"].bbox_min.x,
+         //      g_VirtualScene["light_switch"].bbox_min.y, g_VirtualScene["light_switch"].bbox_min.z);
+
+        // #### Colisão Botões do Painel (senha) ####
+        //if(glfwGetKey(window, GLFW_KEY_E) && !flashlightambient_on && pointAABB_collision2(g_VirtualScene[""], select_point, model_lswitch)){
+            //code[i] = ;
+        //}
+
+
         /*
         // Atualiza a posição do objeto, teste de intersecção p/ pegar objeto, atualiza matriz model
         UpdateInteractiveObject(window, "bunny", model_bunny, select_point);
@@ -1001,18 +1102,8 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model_bunny));
         glUniform1i(object_id_uniform, BUNNY);
         DrawVirtualObject("bunny");
-
-        // Atualiza a posição do objeto, teste de intersecção p/ pegar objeto, atualiza matriz model
-        UpdateInteractiveObject(window, "box", model_box, select_point);
-
-        // Box
-        //model = Matrix_Translate(3.5f,0.0f,0.9f) * Matrix_Scale(0.2f,0.2f,0.2f);
-        RederingObj(&boxmodel, model_box, DEFAULT);
         */
 
-        // Imprimimos na tela os ângulos de Euler que controlam a rotação do
-        // terceiro cubo.
-        TextRendering_ShowEulerAngles(window);
 
         // Imprimimos na tela informação sobre o número de quadros renderizados
         // por segundo (frames per second).
@@ -1942,21 +2033,6 @@ void TextRendering_ShowModelViewProjection(
 
     TextRendering_PrintString(window, " Viewport matrix           NDC      In Pixel Coords.", -1.0f, 1.0f-25*pad, 1.0f);
     TextRendering_PrintMatrixVectorProductMoreDigits(window, viewport_mapping, p_ndc, -1.0f, 1.0f-26*pad, 1.0f);
-}
-
-// Escrevemos na tela os ângulos de Euler definidos nas variáveis globais
-// g_AngleX, g_AngleY, e g_AngleZ.
-void TextRendering_ShowEulerAngles(GLFWwindow* window)
-{
-    if ( !g_ShowInfoText )
-        return;
-
-    float pad = TextRendering_LineHeight(window);
-
-    char buffer[80];
-    snprintf(buffer, 80, "Euler Angles rotation matrix = Z(%.2f)*Y(%.2f)*X(%.2f)\n", g_AngleZ, g_AngleY, g_AngleX);
-
-    TextRendering_PrintString(window, buffer, -1.0f+pad/10, -1.0f+2*pad/10, 1.0f);
 }
 
 // Escrevemos na tela o número de quadros renderizados por segundo (frames per

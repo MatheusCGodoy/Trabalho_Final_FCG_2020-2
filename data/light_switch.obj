@@ -2,6 +2,7 @@
 # www.blender.org
 mtllib ../../data/light_switch.mtl
 o switch0_Cube.001
+g light_switch
 v -1.002882 0.000000 0.098019
 v -1.002882 0.970372 0.098019
 v -1.002882 0.000000 0.014283

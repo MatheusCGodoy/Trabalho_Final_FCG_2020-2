@@ -413,9 +413,9 @@ int main(int argc, char* argv[])
     //Inicializando informações da caixa
     g_VirtualScene["cow"].at_orig_coords = true;
     g_VirtualScene["cow"].picked_up = false;
-    g_VirtualScene["cow"].CoordX = 3.5f;
+    g_VirtualScene["cow"].CoordX = 0.5f;
     g_VirtualScene["cow"].CoordY = 0.2f;
-    g_VirtualScene["cow"].CoordZ = 0.9f;
+    g_VirtualScene["cow"].CoordZ = -0.5f;
     g_VirtualScene["cow"].AngleX = 0.0f;
     g_VirtualScene["cow"].AngleY = 0.0f;
 
@@ -711,6 +711,7 @@ int main(int argc, char* argv[])
         #define SPHERE 0
         #define BUNNY  1
         #define PLANE  2
+        #define COW    7
 
         // Teto
         //model = Matrix_Translate(4.0,2.00f, 2.00) * Matrix_Rotate_Z(1.57)  * Matrix_Scale(1.0f,4.0f,3.0f);
@@ -843,7 +844,7 @@ int main(int argc, char* argv[])
             g_VirtualScene["box"].CoordY = select_point.y;
             g_VirtualScene["box"].CoordZ = select_point.z;
 
-            model_bunny = Matrix_Translate(select_point.x,select_point.y,select_point.z)
+            model_box = Matrix_Translate(select_point.x,select_point.y,select_point.z)
                           * Matrix_Rotate_X(g_VirtualScene["box"].AngleX)
                           * Matrix_Rotate_Y(g_VirtualScene["box"].AngleY) * Matrix_Scale(0.15f, 0.15f, 0.15f);
         }
@@ -851,14 +852,17 @@ int main(int argc, char* argv[])
 
             model_box = Matrix_Translate(g_VirtualScene["box"].CoordX, 0.2f, g_VirtualScene["box"].CoordZ)
                           * Matrix_Scale(0.15f, 0.15f, 0.15f);
-        } else{
-            model_bunny = Matrix_Translate(3.5f,0.2f,0.9f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        }
+        else{
+            model_box = Matrix_Translate(3.5f,0.2f,0.9f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
         }
 
-        RederingObj(&boxmodel, model_bunny, BOX);
+
+        RederingObj(&boxmodel, model_box, BOX);
+
 
         //colisão com a caixa:
-        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["box"], select_point, model_bunny))
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["box"], select_point, model_box))
         {
             std::cout << "Colisão com coelho " << glfwGetTime() << std::endl;
             g_VirtualScene["box"].picked_up = true;
@@ -891,7 +895,7 @@ int main(int argc, char* argv[])
 
 
         // Cow
-        RederingObj(&cow, model_cow, BUNNY);
+        RederingObj(&cow, model_cow, COW);
 
 
         //colisão com a vaca:

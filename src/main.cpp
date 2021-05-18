@@ -328,6 +328,10 @@ int main(int argc, char* argv[])
     ComputeNormals(&cow);
     BuildTrianglesAndAddToVirtualScene(&cow);
 
+    ObjModel button("../../data/button.obj");
+    ComputeNormals(&button);
+    BuildTrianglesAndAddToVirtualScene(&button);
+
 
     if ( argc > 1 )
     {
@@ -448,6 +452,11 @@ int main(int argc, char* argv[])
 
 
     PrintObjModelInfo(&displaymodel);
+
+    //para o código
+    char code[3] = {'0', '0', '0'};
+    char password[3] = {'0', '0', '0'};//{'5', '2', '9'};
+    int i = 0;
 
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
@@ -760,8 +769,45 @@ int main(int argc, char* argv[])
         RederingObj(&spheremodel, model, SPHERE);
 
         // Display
-        glm::mat4 model_display = Matrix_Translate(0.9f,0.5f,4.95f) * Matrix_Scale(0.2f,0.2f,0.2f);
-        RederingObj(&displaymodel, model_display, DEFAULT);
+        //glm::model_display = Matrix_Translate(0.9f,0.5f,4.95f) * Matrix_Scale(0.2f,0.2f,0.2f);
+        //RederingObj(&displaymodel, model_display, DEFAULT);
+
+        float size_bt = 0.05f;
+        //Botão 1
+        glm::mat4 model_button1 = Matrix_Translate(0.55f,0.75f,4.95f) * Matrix_Scale(size_bt,size_bt,size_bt);
+        RederingObj(&button, model_button1, DEFAULT);
+
+        //Botão 2
+        glm::mat4 model_button2 = Matrix_Translate(0.7f,0.75f,4.95f) * Matrix_Scale(size_bt,size_bt,size_bt);
+        RederingObj(&button, model_button2, DEFAULT);
+
+        //Botão 3
+        glm::mat4 model_button3 = Matrix_Translate(0.85f,0.75f,4.95f) * Matrix_Scale(size_bt,size_bt,size_bt);
+        RederingObj(&button, model_button3, DEFAULT);
+
+        //Botão 4
+        glm::mat4 model_button4 = Matrix_Translate(0.55f,0.6f,4.95f) * Matrix_Scale(size_bt,size_bt,size_bt);
+        RederingObj(&button, model_button4, DEFAULT);
+
+        //Botão 5
+        glm::mat4 model_button5 = Matrix_Translate(0.7f,0.6f,4.95f) * Matrix_Scale(size_bt,size_bt,size_bt);
+        RederingObj(&button, model_button5, DEFAULT);
+
+        //Botão 6
+        glm::mat4 model_button6 = Matrix_Translate(0.85f,0.6f,4.95f) * Matrix_Scale(size_bt,size_bt,size_bt);
+        RederingObj(&button, model_button6, DEFAULT);
+
+        //Botão 7
+        glm::mat4 model_button7 = Matrix_Translate(0.55f,0.45f,4.95f) * Matrix_Scale(size_bt,size_bt,size_bt);
+        RederingObj(&button, model_button7, DEFAULT);
+
+        //Botão 8
+        glm::mat4 model_button8 = Matrix_Translate(0.7f,0.45f,4.95f) * Matrix_Scale(size_bt,size_bt,size_bt);
+        RederingObj(&button, model_button8, DEFAULT);
+
+        //Botão 9
+        glm::mat4 model_button9 = Matrix_Translate(0.85f,0.45f,4.95f) * Matrix_Scale(size_bt,size_bt,size_bt);
+        RederingObj(&button, model_button9, DEFAULT);
 
         //glm::mat4 inverseModel =  Matrix_Scale(1/0.15f, 1/0.15f, 1/0.15f) * Matrix_Translate(-2.0f,-1.8f,-2.0f);
         //glm::vec4 vec_orig = camera_position_c * inverseModel;
@@ -904,13 +950,13 @@ int main(int argc, char* argv[])
         */
 
 
-        //##### Colisão LIGHTSWITCH #########
-        if(glfwGetKey(window, GLFW_KEY_E) && !flashlightambient_on && pointAABB_collision2(g_VirtualScene["display"], select_point, model_display)){
+        //##### LIGHTSWITCH #########
+        /*if(glfwGetKey(window, GLFW_KEY_E) && !flashlightambient_on && pointAABB_collision2(g_VirtualScene["light_switch"], select_point, model_lswitch)){
             flashlightambient_on = true;
         }
-        else if(glfwGetKey(window, GLFW_KEY_E) && flashlightambient_on && pointAABB_collision2(g_VirtualScene["display"], select_point, model_display)){
+        else if(glfwGetKey(window, GLFW_KEY_E) && flashlightambient_on && pointAABB_collision2(g_VirtualScene["light_switch"], select_point, model_lswitch)){
             flashlightambient_on = false;
-        }
+        }*/
 
         if(flashlightambient_on){
             glUniform1i(is_flashlightambient_on, true);
@@ -918,6 +964,50 @@ int main(int argc, char* argv[])
         else{
             glUniform1i(is_flashlightambient_on, false);
         }
+
+        //model_button1
+        // #### Botões para a senha ####
+        if(glfwGetKey(window, GLFW_KEY_E) == GLFW_REPEAT && pointAABB_collision2(g_VirtualScene["button"], select_point, model_button1)){
+            code[i] = '1';
+            i++;
+        }
+        if(glfwGetKey(window, GLFW_KEY_E) == GLFW_REPEAT && pointAABB_collision2(g_VirtualScene["button"], select_point, model_button2)){
+            code[i] = '2';
+            i++;
+        }
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["button"], select_point, model_button3)){
+            code[i] = '3';
+            i++;
+        }
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["button"], select_point, model_button4)){
+            code[i] = '4';
+            i++;
+        }
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["button"], select_point, model_button5)){
+            code[i] = '5';
+            i++;
+        }
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["button"], select_point, model_button6)){
+            code[i] = '6';
+            i++;
+        }
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["button"], select_point, model_button7)){
+            code[i] = '7';
+            i++;
+        }
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["button"], select_point, model_button8)){
+            code[i] = '8';
+            i++;
+        }
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["button"], select_point, model_button9)){
+            code[i] = '9';
+            i++;
+        }
+        if(i > 3 && strcmp(code, password)){
+            return 100;
+        }
+        else
+            i = 0;
 
          //printf("bbox_light: max= %f %f %f | min= %f %f %f \n", g_VirtualScene["light_switch"].bbox_max.x,
          //      g_VirtualScene["light_switch"].bbox_max.y, g_VirtualScene["light_switch"].bbox_max.z, g_VirtualScene["light_switch"].bbox_min.x,

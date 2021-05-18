@@ -1,6 +1,8 @@
 # Blender MTL File: 'None'
 # Material Count: 5
 
+g display
+
 newmtl Material.001
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000

@@ -119,11 +119,17 @@ void RederingObj(ObjModel* models, glm::mat4 model, int mod);
 void UpdateInteractiveObject(GLFWwindow* window, const char *objname, glm::mat4& model, glm::vec4 select_point);
 
 #define SPHERE 0
+#define BUNNY  1
 #define WALL  2
 #define DEFAULT  3
-#define LIGTHSWITCH 4
+#define LIGTHSWITCH  4
 #define BOX 5
 #define BOXNORMAL 6
+#define COW 7
+#define FLOOR 8
+#define ROOF   9
+#define COWNORMAL   10
+#define BUNNYNORMAL   11
 
 //#include "Objects.h"
 #include "collisions.h"
@@ -300,9 +306,14 @@ int main(int argc, char* argv[])
     LoadShadersFromFiles();
 
     // Carregamos as imagens para serem utilizadas como texturas
-    LoadTextureImage("../../data/10121_Light_Switch_v1_Diffuse_SG.jpg");      // TextureImage0
     LoadTextureImage("../../data/wall.jpg"); // TextureImage1
     LoadTextureImage("../../data/box.jpg");
+
+    LoadTextureImage("../../data/boxnumber.jpg");
+    LoadTextureImage("../../data/bunnynumber.jpg");
+    LoadTextureImage("../../data/cownumber.jpg");
+    LoadTextureImage("../../data/floor.jpg");
+    LoadTextureImage("../../data/roof.jpg");
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
     ObjModel spheremodel("../../data/sphere.obj");
@@ -332,7 +343,7 @@ int main(int argc, char* argv[])
     ObjModel light_switchmodel("../../data/light_switch.obj");
     ComputeNormals(&light_switchmodel);
     BuildTrianglesAndAddToVirtualScene(&light_switchmodel);
- 
+
     ObjModel cow("../../data/cow.obj");
     ComputeNormals(&cow);
     BuildTrianglesAndAddToVirtualScene(&cow);
@@ -406,7 +417,7 @@ int main(int argc, char* argv[])
     g_VirtualScene["box"].picked_up = false;
     g_VirtualScene["box"].CoordX = 3.5f;
     g_VirtualScene["box"].CoordY = 0.2f;
-    g_VirtualScene["box"].CoordZ = 0.9f;
+    g_VirtualScene["box"].CoordZ = 1.0f;
     g_VirtualScene["box"].AngleX = 0.0f;
     g_VirtualScene["box"].AngleY = 0.0f;
 
@@ -415,9 +426,9 @@ int main(int argc, char* argv[])
     g_VirtualScene["cow"].picked_up = false;
     g_VirtualScene["cow"].CoordX = 0.5f;
     g_VirtualScene["cow"].CoordY = 0.2f;
-    g_VirtualScene["cow"].CoordZ = -0.5f;
+    g_VirtualScene["cow"].CoordZ = 0.0f;
     g_VirtualScene["cow"].AngleX = 0.0f;
-    g_VirtualScene["cow"].AngleY = 0.0f;
+    g_VirtualScene["cow"].AngleY = 0.0f; 
 
     // WALL Object:
     // Teto
@@ -708,21 +719,16 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(view_uniform       , 1 , GL_FALSE , glm::value_ptr(view));
         glUniformMatrix4fv(projection_uniform , 1 , GL_FALSE , glm::value_ptr(projection));
 
-        #define SPHERE 0
-        #define BUNNY  1
-        #define PLANE  2
-        #define COW    7
-
         // Teto
         //model = Matrix_Translate(4.0,2.00f, 2.00) * Matrix_Rotate_Z(1.57)  * Matrix_Scale(1.0f,4.0f,3.0f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model_teto));
-        glUniform1i(object_id_uniform, WALL);
+        glUniform1i(object_id_uniform, ROOF);
         DrawVirtualObject("wall");
 
         //Chão
         //model = Matrix_Translate(4.0,0.00f, 2.00) * Matrix_Rotate_Z(1.57)  * Matrix_Scale(1.0f,4.0f,3.0f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model_chao));
-        glUniform1i(object_id_uniform, WALL);
+        glUniform1i(object_id_uniform, FLOOR);
         DrawVirtualObject("wall");
 
 
@@ -764,7 +770,7 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, WALL);
         DrawVirtualObject("wall");
 
-         //Lightswitch         
+         //Lightswitch
         model = Matrix_Translate(2.9f,0.7f,4.95f)* Matrix_Rotate_X(3.14) * Matrix_Scale(0.2f,0.2f,0.2f);
         RederingObj(&light_switchmodel, model, DEFAULT);
 
@@ -793,7 +799,7 @@ int main(int argc, char* argv[])
         // Ponto de seleção - usado para pegar os objetos - teste de intersecção
         select_point = camera_position_c + (camera_view_vector*0.2f);
 
-       
+
 
         // Testa se está segurando o coelho
         if(g_VirtualScene["bunny"].picked_up && glfwGetKey(window, GLFW_KEY_E)){
@@ -819,8 +825,27 @@ int main(int argc, char* argv[])
             model_bunny = Matrix_Translate(2.0f,0.2f,2.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
         }
 
-
         RederingObj(&bunnymodel, model_bunny, BUNNY);
+
+        model = Matrix_Translate(2.0f,0.2f,0.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&bunnymodel, model, BUNNYNORMAL);
+        model = Matrix_Translate(2.0f,0.2f,0.5f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&bunnymodel, model, BUNNYNORMAL);
+        model = Matrix_Translate(2.0f,0.2f,1.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&bunnymodel, model, BUNNYNORMAL);
+        model = Matrix_Translate(2.0f,0.2f,1.5f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&bunnymodel, model, BUNNYNORMAL);
+        
+        model = Matrix_Translate(2.0f,0.2f,2.5f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&bunnymodel, model, BUNNYNORMAL);
+        model = Matrix_Translate(2.0f,0.2f,3.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&bunnymodel, model, BUNNYNORMAL);
+        model = Matrix_Translate(2.0f,0.2f,3.5f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&bunnymodel, model, BUNNYNORMAL);
+        model = Matrix_Translate(2.0f,0.2f,4.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&bunnymodel, model, BUNNYNORMAL);
+        model = Matrix_Translate(2.0f,0.2f,4.5f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&bunnymodel, model, BUNNYNORMAL);
 
 
         //colisão com o coelho:
@@ -854,12 +879,36 @@ int main(int argc, char* argv[])
                           * Matrix_Scale(0.15f, 0.15f, 0.15f);
         }
         else{
-            model_box = Matrix_Translate(3.5f,0.2f,0.9f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+            model_box = Matrix_Translate(3.5f,0.2f,1.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
         }
 
 
         RederingObj(&boxmodel, model_box, BOX);
+        
+        model = Matrix_Translate(3.5f,0.2f,0.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&boxmodel, model, BOXNORMAL);
 
+        model = Matrix_Translate(3.5f,0.2f,0.5f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&boxmodel, model, BOXNORMAL);
+
+        model = Matrix_Translate(3.5f,0.2f,1.5f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&boxmodel, model, BOXNORMAL);
+
+         model = Matrix_Translate(3.5f,0.2f,2.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&boxmodel, model, BOXNORMAL);
+
+        model = Matrix_Translate(3.5f,0.2f,2.5f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&boxmodel, model, BOXNORMAL);
+
+        model = Matrix_Translate(3.5f,0.2f,3.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&boxmodel, model, BOXNORMAL);
+
+        model = Matrix_Translate(3.5f,0.2f,3.5f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&boxmodel, model, BOXNORMAL);
+        model = Matrix_Translate(3.5f,0.2f,4.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&boxmodel, model, BOXNORMAL);
+        model = Matrix_Translate(3.5f,0.2f,4.5f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        RederingObj(&boxmodel, model, BOXNORMAL);
 
         //colisão com a caixa:
         if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["box"], select_point, model_box))
@@ -890,13 +939,40 @@ int main(int argc, char* argv[])
                           * Matrix_Scale(0.2f, 0.2f, 0.2f);
         }
         else{
-            model_cow = Matrix_Translate(0.5f,0.2f,-0.5f) * Matrix_Scale(0.2f, 0.2f, 0.2f);
+            model_cow = Matrix_Translate(0.5f,0.2f,0.0f) * Matrix_Scale(0.2f, 0.2f, 0.2f);
         }
 
 
         // Cow
         RederingObj(&cow, model_cow, COW);
 
+
+        model = Matrix_Translate(0.5f,0.2f,0.5f) * Matrix_Scale(0.2f, 0.2f, 0.2f);
+        RederingObj(&cow, model, COWNORMAL);
+
+        model = Matrix_Translate(0.5f,0.2f,1.0f) * Matrix_Scale(0.2f, 0.2f, 0.2f);
+        RederingObj(&cow, model, COWNORMAL);
+
+        model = Matrix_Translate(0.5f,0.2f,1.5f) * Matrix_Scale(0.2f, 0.2f, 0.2f);
+        RederingObj(&cow, model, COWNORMAL);
+
+        model = Matrix_Translate(0.5f,0.2f,2.0f) * Matrix_Scale(0.2f, 0.2f, 0.2f);
+        RederingObj(&cow, model, COWNORMAL);
+
+        model = Matrix_Translate(0.5f,0.2f,2.5f) * Matrix_Scale(0.2f, 0.2f, 0.2f);
+        RederingObj(&cow, model, COWNORMAL);
+
+        model = Matrix_Translate(0.5f,0.2f,3.0f) * Matrix_Scale(0.2f, 0.2f, 0.2f);
+        RederingObj(&cow, model, COWNORMAL);
+
+        model = Matrix_Translate(0.5f,0.2f,3.5f) * Matrix_Scale(0.2f, 0.2f, 0.2f);
+        RederingObj(&cow, model, COWNORMAL);
+
+        model = Matrix_Translate(0.5f,0.2f,4.0f) * Matrix_Scale(0.2f, 0.2f, 0.2f);
+        RederingObj(&cow, model, COWNORMAL);
+
+        model = Matrix_Translate(0.5f,0.2f,4.5f) * Matrix_Scale(0.2f, 0.2f, 0.2f);
+        RederingObj(&cow, model, COWNORMAL);
 
         //colisão com a vaca:
         if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["cow"], select_point, model_cow))
@@ -1123,6 +1199,10 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(program_id, "TextureImage0"), 0);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage1"), 1);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage2"), 2);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage3"), 3);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage4"), 4);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage5"), 5);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage6"), 6);
     glUseProgram(0);
 }
 

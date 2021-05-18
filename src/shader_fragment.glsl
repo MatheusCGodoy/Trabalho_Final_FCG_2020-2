@@ -31,6 +31,10 @@ uniform bool is_flashlightambient_on;
 #define BOX 5
 #define BOXNORMAL 6
 #define COW 7
+#define FLOOR 8
+#define ROOF   9
+#define COWNORMAL   10
+#define BUNNYNORMAL   11
 
 uniform int object_id;
 
@@ -42,6 +46,10 @@ uniform vec4 bbox_max;
 uniform sampler2D TextureImage0;
 uniform sampler2D TextureImage1;
 uniform sampler2D TextureImage2;
+uniform sampler2D TextureImage3;
+uniform sampler2D TextureImage4;
+uniform sampler2D TextureImage5;
+uniform sampler2D TextureImage6;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec3 color;
@@ -139,7 +147,7 @@ void main()
         //   constante M_PI
         //   variável position_model
 
-        vec4 bbox_center = (bbox_min + bbox_max) / 2.0; // centro da esfera
+/*         vec4 bbox_center = (bbox_min + bbox_max) / 2.0; // centro da esfera
         float radius = 1; //raio da esfera
         vec4 p_circle = bbox_center + radius*((position_model - bbox_center)/length(position_model - bbox_center)); //ponto do modelo projetado na superficie da esfera
 
@@ -149,13 +157,7 @@ void main()
         U = (theta + M_PI) / (2 * M_PI);
         V = (phi + M_PI_2) / M_PI;
 
-
-        // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-        vec3 Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
-
-        //Obtemos a refletancia difusa da segunda textura
-        vec3 Kd1 = texture(TextureImage1, vec2(U,V)).rgb;
-
+ */
         // Equação de Iluminação
         float lambert = max(0,dot(n,l));
 
@@ -184,7 +186,7 @@ void main()
         // 'h' no slides 158-160 do documento Aula_20_Mapeamento_de_Texturas.pdf.
         // Veja também a Questão 4 do Questionário 4 no Moodle.
 
-        /* float minx = bbox_min.x;
+        float minx = bbox_min.x;
         float maxx = bbox_max.x;
 
         float miny = bbox_min.y;
@@ -197,12 +199,47 @@ void main()
         U = (position_model.x - minx)/(maxx - minx);
         V = (position_model.y - miny)/(maxy - miny);
 
-        Kd = texture(TextureImage0, vec2(U,V)).rgb; */
+        Kd = texture(TextureImage0, vec2(U,V)).rgb;
         Kd = vec3(0.8,0.8,0.0);
         // Propriedades espectrais do coelho
         //Kd = vec3(0.08,0.4,0.8);
         Ks = vec3(0.8,0.8,0.8);
         Ka = vec3(0.04,0.04,0.04);
+        if(is_flashlight_on && !not_under_light && !is_flashlightambient_on){
+            Kd = texture(TextureImage3, vec2(U,V)).rgb;
+        }
+        //q = 32.0; //phong
+        q = 80; //blinn-phong
+    }    else if ( object_id == BUNNYNORMAL )
+    {
+        // PREENCHA AQUI as coordenadas de textura do coelho, computadas com
+        // projeção planar XY em COORDENADAS DO MODELO. Utilize como referência
+        // o slides 99-104 do documento Aula_20_Mapeamento_de_Texturas.pdf,
+        // e também use as variáveis min*/max* definidas abaixo para normalizar
+        // as coordenadas de textura U e V dentro do intervalo [0,1]. Para
+        // tanto, veja por exemplo o mapeamento da variável 'p_v' utilizando
+        // 'h' no slides 158-160 do documento Aula_20_Mapeamento_de_Texturas.pdf.
+        // Veja também a Questão 4 do Questionário 4 no Moodle.
+
+        float minx = bbox_min.x;
+        float maxx = bbox_max.x;
+
+        float miny = bbox_min.y;
+        float maxy = bbox_max.y;
+
+        float minz = bbox_min.z;
+        float maxz = bbox_max.z;
+
+        // projeção planar XY em COORDENADAS DO MODELO.
+        U = (position_model.x - minx)/(maxx - minx);
+        V = (position_model.y - miny)/(maxy - miny);
+
+        Kd = vec3(0.8,0.8,0.0);
+        // Propriedades espectrais do coelho
+        //Kd = vec3(0.08,0.4,0.8);
+        Ks = vec3(0.8,0.8,0.8);
+        Ka = vec3(0.04,0.04,0.04);
+
         //q = 32.0; //phong
         q = 80; //blinn-phong
     }
@@ -216,7 +253,33 @@ void main()
         //Kd = texture(TextureImage0, vec2(U,V)).rgb;
 
 
-        Kd = vec3(0.0,0.5,1.0); //vec3(0.2,0.3,1.0);
+        Kd = vec3(0.1,0.4,0.9); 
+        Ks = vec3(0.3,0.3,0.3);
+        Ka = vec3(0.0,0.0,0.0);
+        q = 100.0;
+    }else if ( object_id == FLOOR ){
+        // Coordenadas de textura do plano, obtidas do arquivo OBJ.
+        U = texcoords.x;
+        V = texcoords.y;
+
+        // Propriedades espectrais do plano
+        //Kd = texture(TextureImage0, vec2(U,V)).rgb;
+
+
+        Kd = vec3(0.1,0.1,0.1); //vec3(0.2,0.3,1.0);
+        Ks = vec3(0.3,0.3,0.3);
+        Ka = vec3(0.0,0.0,0.0);
+        q = 100.0;
+    }else if ( object_id == ROOF ){
+        // Coordenadas de textura do plano, obtidas do arquivo OBJ.
+        U = texcoords.x;
+        V = texcoords.y;
+
+        // Propriedades espectrais do plano
+        //Kd = texture(TextureImage0, vec2(U,V)).rgb;
+
+
+        Kd = vec3(0.3,0.3,0.3); //vec3(0.2,0.3,1.0);
         Ks = vec3(0.3,0.3,0.3);
         Ka = vec3(0.0,0.0,0.0);
         q = 100.0;
@@ -240,9 +303,6 @@ void main()
         U = texcoords.x;
         V = texcoords.y;
 
-        hasKD0 = true;
-        Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
-
         // Propriedades espectrais do plano
         //Kd = texture(TextureImage0, vec2(U,V)).rgb;
         Ka = Kau;
@@ -255,20 +315,17 @@ void main()
         V = texcoords.y;
 
         hasKD0 = true;
-        Kd0 = texture(TextureImage2, vec2(U,V)).rgb;
-
-
-
 
         // Propriedades espectrais do plano
         //Kd = texture(TextureImage0, vec2(U,V)).rgb;
         Ka = Kau;
-        Kd = Kdu;
+        Kd = texture(TextureImage1, vec2(U,V)).rgb;;
         Ks = Ksu;
         q = 50.0;
 
-        if(is_flashlight_on && !not_under_light){
-            Kd = vec3(0.0,0.2,0.0);;
+        if(is_flashlight_on && !not_under_light && !is_flashlightambient_on){
+            Kd = texture(TextureImage2, vec2(U,V)).rgb;
+            q = 20.0;
         }
     }
     else if ( object_id == BOXNORMAL ) {
@@ -277,20 +334,58 @@ void main()
         V = texcoords.y;
 
         hasKD0 = true;
-        Kd0 = texture(TextureImage2, vec2(U,V)).rgb;
 
         // Propriedades espectrais do plano
         //Kd = texture(TextureImage0, vec2(U,V)).rgb;
         Ka = Kau;
-        Kd = Kdu;
+        Kd = texture(TextureImage1, vec2(U,V)).rgb;;
         Ks = Ksu;
-        q = 1.0;
+        q = 50.0;
 
     }
     else if(object_id == COW){
+        float minx = bbox_min.x;
+        float maxx = bbox_max.x;
+
+        float miny = bbox_min.y;
+        float maxy = bbox_max.y;
+
+        float minz = bbox_min.z;
+        float maxz = bbox_max.z;
+
+        // projeção planar XY em COORDENADAS DO MODELO.
+        U = (position_model.x - minx)/(maxx - minx);
+        V = (position_model.y - miny)/(maxy - miny);
+
+
         Kd = vec3(0.0,0.8,0.1);
         Ks = vec3(0.3,0.3,0.3);
         Ka = vec3(0.04,0.04,0.04);
+        
+        if(is_flashlight_on && !not_under_light && !is_flashlightambient_on){
+            Kd = texture(TextureImage4, vec2(U,V)).rgb;
+        }
+        //q = 32.0; //phong
+        q = 80; //blinn-phong
+    }    else if(object_id == COWNORMAL){
+        float minx = bbox_min.x;
+        float maxx = bbox_max.x;
+
+        float miny = bbox_min.y;
+        float maxy = bbox_max.y;
+
+        float minz = bbox_min.z;
+        float maxz = bbox_max.z;
+
+        // projeção planar XY em COORDENADAS DO MODELO.
+        U = (position_model.x - minx)/(maxx - minx);
+        V = (position_model.y - miny)/(maxy - miny);
+
+
+        Kd = vec3(0.0,0.8,0.1);
+        Ks = vec3(0.3,0.3,0.3);
+        Ka = vec3(0.04,0.04,0.04);
+    
         //q = 32.0; //phong
         q = 80; //blinn-phong
     }
@@ -361,11 +456,9 @@ void main()
     //color = lambert_diffuse_term + ambient_term; // para testar sem iluminação especular
     // Cor final do fragmento calculada com uma combinação dos termos difuso,
     // especular, e ambiente. Veja slide 129 do documento Aula_17_e_18_Modelos_de_Iluminacao.pdf.
-    if (hasKD0){
-        color = Kd0 * lswitch*(lambert_diffuse_term + phong_specular_term + ambient_term) + intensity*(diffuse_flash + specular_flash);
-    } else {
-        color = lswitch*(lambert_diffuse_term + phong_specular_term + ambient_term) + intensity*(diffuse_flash + specular_flash);
-    }
+
+    color = lswitch*(lambert_diffuse_term + phong_specular_term + ambient_term) + intensity*(diffuse_flash + specular_flash);
+    
 
     // Cor final com correção gamma, considerando monitor sRGB.
     // Veja https://en.wikipedia.org/w/index.php?title=Gamma_correction&oldid=751281772#Windows.2C_Mac.2C_sRGB_and_TV.2Fvideo_standard_gammas

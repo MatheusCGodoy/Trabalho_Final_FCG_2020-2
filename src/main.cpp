@@ -122,7 +122,7 @@ void UpdateInteractiveObject(GLFWwindow* window, const char *objname, glm::mat4&
 #define WALL  2
 #define DEFAULT  3
 #define LIGTHSWITCH 4
-#define BOX 5   
+#define BOX 5
 #define BOXNORMAL 6
 
 //#include "Objects.h"
@@ -329,9 +329,13 @@ int main(int argc, char* argv[])
     ComputeNormals(&displaymodel);
     BuildTrianglesAndAddToVirtualScene(&displaymodel);
 
-    ObjModel light_switchmodel("../../data/light_switch.obj");
-    ComputeNormals(&light_switchmodel);
-    BuildTrianglesAndAddToVirtualScene(&light_switchmodel);
+    //ObjModel light_switchmodel("../../data/light_switch.obj");
+    //ComputeNormals(&light_switchmodel);
+    //BuildTrianglesAndAddToVirtualScene(&light_switchmodel);
+
+    ObjModel cow("../../data/cow.obj");
+    ComputeNormals(&cow);
+    BuildTrianglesAndAddToVirtualScene(&cow);
 
 
     if ( argc > 1 )
@@ -378,6 +382,9 @@ int main(int argc, char* argv[])
     glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
     glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
 
+    // Ponto para seleção de objetos
+    glm::vec4 select_point = camera_position_c + (camera_view_vector*0.2f);
+
     // Vetor de gravidade:
     glm::vec4 gravity_vec = glm::vec4(0.0f,-0.3f,0.0f,0.0f);
 
@@ -402,6 +409,15 @@ int main(int argc, char* argv[])
     g_VirtualScene["box"].CoordZ = 0.9f;
     g_VirtualScene["box"].AngleX = 0.0f;
     g_VirtualScene["box"].AngleY = 0.0f;
+
+    //Inicializando informações da caixa
+    g_VirtualScene["cow"].at_orig_coords = true;
+    g_VirtualScene["cow"].picked_up = false;
+    g_VirtualScene["cow"].CoordX = 3.5f;
+    g_VirtualScene["cow"].CoordY = 0.2f;
+    g_VirtualScene["cow"].CoordZ = 0.9f;
+    g_VirtualScene["cow"].AngleX = 0.0f;
+    g_VirtualScene["cow"].AngleY = 0.0f;
 
     // WALL Object:
     // Teto
@@ -428,19 +444,14 @@ int main(int argc, char* argv[])
     // BUNNY
     glm::mat4 model_bunny = Matrix_Translate(2.0f,0.2f,2.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
 
+    //COW
+    glm::mat4 model_cow = Matrix_Translate(0.5f,0.2f,-0.5f) * Matrix_Scale(0.2f, 0.2f, 0.2f);
 
     //Medição do tempo a cada frame
     float time_now = glfwGetTime();
     float dt = 0.0f;
     float time_prev = 0.0f;
 
-
-    //Dados do coelho:
-    bool picked_bunny = false;
-    bool at_orig_coords = true;
-    float bunnyCoordX = 2.0f;
-    float bunnyCoordY = 0.2f;
-    float bunnyCoordZ = 2.0f;
 
     PrintObjModelInfo(&displaymodel);
 
@@ -726,10 +737,8 @@ int main(int argc, char* argv[])
         glm::vec4 p_orig = camera_position_c;
         glm::vec4 p_end = camera_position_c + (camera_view_vector*0.2f);
 
-        //if(LINE_collision(g_VirtualScene["wall"], p_orig, p_end, model_parede1))
-            //std::cout << "Colisao com parede " << glfwGetTime() <<std::endl;
 
-        glm::vec4 select_point = camera_position_c + (camera_view_vector*0.2f);
+        select_point = camera_position_c + (camera_view_vector*0.2f);
         //if(pointAABB_collision(g_VirtualScene["wall"], select_point, model_parede1))
             //std::cout << "Colisão com parede" << glfwGetTime() << std::endl;
 
@@ -785,8 +794,8 @@ int main(int argc, char* argv[])
         }
 
         // Lightswitch
-        model = Matrix_Translate(1.0f,1.0f,3.0f) * Matrix_Rotate_Y(3.15) * Matrix_Translate(-1.0f,0.0f,-1.95f) * Matrix_Scale(0.03f,0.03f,0.03f);
-        RederingObj(&light_switchmodel, model, LIGTHSWITCH);
+/*         model = Matrix_Translate(1.0f,1.0f,3.0f) * Matrix_Rotate_Y(3.15) * Matrix_Translate(-1.0f,0.0f,-1.95f) * Matrix_Scale(0.03f,0.03f,0.03f);
+        RederingObj(&light_switchmodel, model, LIGTHSWITCH); */
 
         // Testa se está segurando o coelho
         if(g_VirtualScene["bunny"].picked_up && glfwGetKey(window, GLFW_KEY_E)){
@@ -810,12 +819,12 @@ int main(int argc, char* argv[])
         }
         else{
             model_bunny = Matrix_Translate(2.0f,0.2f,2.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
-        }    
+        }
+
 
         RederingObj(&bunnymodel, model_bunny, BUNNY);
 
-        //if(LINE_collision(g_VirtualScene["bunny"], p_orig, p_end, model))
-            //std::cout << "Colisao com coelho " << glfwGetTime() << std::endl;
+
         //colisão com o coelho:
         if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["bunny"], select_point, model_bunny))
         {
@@ -825,8 +834,7 @@ int main(int argc, char* argv[])
         }
 
 
-        // CAIXA INTERATIVA
-        // Testa se está segurando a caixa
+        // Testa se está segurando o coelho
         if(g_VirtualScene["box"].picked_up && glfwGetKey(window, GLFW_KEY_E)){
             g_VirtualScene["box"].picked_up = false;
             g_VirtualScene["box"].AngleX = 0.0f;
@@ -838,31 +846,75 @@ int main(int argc, char* argv[])
             g_VirtualScene["box"].CoordY = select_point.y;
             g_VirtualScene["box"].CoordZ = select_point.z;
 
-            model_box = Matrix_Translate(select_point.x,select_point.y,select_point.z)
+            model_bunny = Matrix_Translate(select_point.x,select_point.y,select_point.z)
                           * Matrix_Rotate_X(g_VirtualScene["box"].AngleX)
                           * Matrix_Rotate_Y(g_VirtualScene["box"].AngleY) * Matrix_Scale(0.15f, 0.15f, 0.15f);
         }
         else if(!(g_VirtualScene["box"].at_orig_coords) && !(g_VirtualScene["box"].picked_up)){
+
             model_box = Matrix_Translate(g_VirtualScene["box"].CoordX, 0.2f, g_VirtualScene["box"].CoordZ)
                           * Matrix_Scale(0.15f, 0.15f, 0.15f);
-        }
-        else{
-            model_box = Matrix_Translate(1.0f,0.2f,3.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
+        } else{
+            model_bunny = Matrix_Translate(3.5f,0.2f,0.9f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
         }
 
-        RederingObj(&boxmodel, model_box, BOX);
-
-        // Box
-        //model = Matrix_Translate(3.5f,0.0f,0.9f) * Matrix_Scale(0.2f,0.2f,0.2f);
-        //RederingObj(&boxmodel, model_box, DEFAULT);
+        RederingObj(&boxmodel, model_bunny, BOX);
 
         //colisão com a caixa:
-        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["box"], select_point, model_box))
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["box"], select_point, model_bunny))
         {
-            std::cout << "Colisão com caixa " << glfwGetTime() << std::endl;
+            std::cout << "Colisão com coelho " << glfwGetTime() << std::endl;
             g_VirtualScene["box"].picked_up = true;
             g_VirtualScene["box"].at_orig_coords = false;
         }
+
+        // Testa se está segurando a vaca
+        if(g_VirtualScene["cow"].picked_up && glfwGetKey(window, GLFW_KEY_E)){
+            g_VirtualScene["cow"].picked_up = false;
+            g_VirtualScene["cow"].AngleX = 0.0f;
+            g_VirtualScene["cow"].AngleY = 0.0f;
+        }
+
+        if(g_VirtualScene["cow"].picked_up){
+            g_VirtualScene["cow"].CoordX = select_point.x;
+            g_VirtualScene["cow"].CoordY = select_point.y;
+            g_VirtualScene["cow"].CoordZ = select_point.z;
+
+            model_cow = Matrix_Translate(select_point.x,select_point.y,select_point.z)
+                          * Matrix_Rotate_X(g_VirtualScene["cow"].AngleX)
+                          * Matrix_Rotate_Y(g_VirtualScene["cow"].AngleY) * Matrix_Scale(0.2f, 0.2f, 0.2f);
+        }
+        else if(!(g_VirtualScene["cow"].at_orig_coords) && !(g_VirtualScene["cow"].picked_up)){
+            model_cow = Matrix_Translate(g_VirtualScene["cow"].CoordX, 0.2f, g_VirtualScene["cow"].CoordZ)
+                          * Matrix_Scale(0.2f, 0.2f, 0.2f);
+        }
+        else{
+            model_cow = Matrix_Translate(0.5f,0.2f,-0.5f) * Matrix_Scale(0.2f, 0.2f, 0.2f);
+        }
+
+
+        // Cow
+        RederingObj(&cow, model_cow, BUNNY);
+
+
+        //colisão com a vaca:
+        if(glfwGetKey(window, GLFW_KEY_E) && pointAABB_collision2(g_VirtualScene["cow"], select_point, model_cow))
+        {
+            std::cout << "Colisão com coelho " << glfwGetTime() << std::endl;
+            g_VirtualScene["cow"].picked_up = true;
+            g_VirtualScene["cow"].at_orig_coords = false;
+        }
+
+        /*printf("bbox_coelho: max= %f %f %f | min= %f %f %f ", g_VirtualScene["bunny"].bbox_max.x,
+               g_VirtualScene["bunny"].bbox_max.y, g_VirtualScene["bunny"].bbox_max.z, g_VirtualScene["bunny"].bbox_min.x,
+               g_VirtualScene["bunny"].bbox_min.y, g_VirtualScene["bunny"].bbox_min.z);
+        printf("bbox_caixa: max= %f %f %f | min= %f %f %f ", g_VirtualScene["box"].bbox_max.x,
+               g_VirtualScene["box"].bbox_max.y, g_VirtualScene["box"].bbox_max.z, g_VirtualScene["box"].bbox_min.x,
+               g_VirtualScene["box"].bbox_min.y, g_VirtualScene["box"].bbox_min.z);
+        printf("bbox_cow: max= %f %f %f | min= %f %f %f ", g_VirtualScene["cow"].bbox_max.x,
+               g_VirtualScene["cow"].bbox_max.y, g_VirtualScene["cow"].bbox_max.z, g_VirtualScene["cow"].bbox_min.x,
+               g_VirtualScene["cow"].bbox_min.y, g_VirtualScene["cow"].bbox_min.z);
+        */
 
 
         /*
@@ -1579,6 +1631,12 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 
         g_VirtualScene["bunny"].AngleY -= 0.01f*dx;
         g_VirtualScene["bunny"].AngleX += 0.01f*dy;
+
+        g_VirtualScene["box"].AngleY -= 0.01f*dx;
+        g_VirtualScene["box"].AngleX += 0.01f*dy;
+
+        g_VirtualScene["cow"].AngleY -= 0.01f*dx;
+        g_VirtualScene["cow"].AngleX += 0.01f*dy;
 
         // Atualizamos as variáveis globais para armazenar a posição atual do
         // cursor como sendo a última posição conhecida do cursor.

@@ -101,7 +101,6 @@ void TextRendering_PrintMatrixVectorProductDivW(GLFWwindow* window, glm::mat4 M,
 // Funções abaixo renderizam como texto na janela OpenGL algumas matrizes e
 // outras informações do programa. Definidas após main().
 void TextRendering_ShowModelViewProjection(GLFWwindow* window, glm::mat4 projection, glm::mat4 view, glm::mat4 model, glm::vec4 p_model);
-void TextRendering_ShowEulerAngles(GLFWwindow* window);
 void TextRendering_ShowFramesPerSecond(GLFWwindow* window);
 
 // Funções callback para comunicação com o sistema operacional e interação do
@@ -116,7 +115,7 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 int ValidatePosition(glm::vec4 position);
 void RederingObj(ObjModel* models, glm::mat4 model, int mod);
 
-void UpdateInteractiveObject(GLFWwindow* window, const char *objname, glm::mat4& model, glm::vec4 select_point);
+//void UpdateInteractiveObject(GLFWwindow* window, const char *objname, glm::mat4& model, glm::vec4 select_point);
 
 #define SPHERE 0
 #define WALL  2
@@ -212,14 +211,6 @@ GLuint g_NumLoadedTextures = 0;
 GLint Ka_uniform;
 GLint Kd_uniform;
 GLint Ks_uniform;
-
-
-//Dados do coelho:
-//bool picked_bunny = false;
-//bool at_orig_coords = true;
-//float bunnyCoordX = 2.0f;
-//float bunnyCoordY = 0.2f;
-//float bunnyCoordZ = 2.0f;
 
 
 //################# MAIN #######################
@@ -325,7 +316,7 @@ int main(int argc, char* argv[])
     ComputeNormals(&boxmodel);
     BuildTrianglesAndAddToVirtualScene(&boxmodel);
 
-        ObjModel displaymodel("../../data/display.obj");
+    ObjModel displaymodel("../../data/display.obj");
     ComputeNormals(&displaymodel);
     BuildTrianglesAndAddToVirtualScene(&displaymodel);
 
@@ -739,7 +730,7 @@ int main(int argc, char* argv[])
         glm::vec4 p_end = camera_position_c + (camera_view_vector*0.2f);
 
 
-        select_point = camera_position_c + (camera_view_vector*0.2f);
+        //select_point = camera_position_c + (camera_view_vector*0.2f);
         //if(pointAABB_collision(g_VirtualScene["wall"], select_point, model_parede1))
             //std::cout << "Colisão com parede" << glfwGetTime() << std::endl;
 
@@ -790,9 +781,6 @@ int main(int argc, char* argv[])
         // Ponto de seleção - usado para pegar os objetos - teste de intersecção
         select_point = camera_position_c + (camera_view_vector*0.2f);
 
-        if (select_point.x == 1.0,select_point.y == 1.0, select_point.z == 3.0){
-            printf("asdwad");
-        }
 
         // Lightswitch
 /*         model = Matrix_Translate(1.0f,1.0f,3.0f) * Matrix_Rotate_Y(3.15) * Matrix_Translate(-1.0f,0.0f,-1.95f) * Matrix_Scale(0.03f,0.03f,0.03f);
@@ -921,6 +909,7 @@ int main(int argc, char* argv[])
         */
 
 
+
         /*
         // Atualiza a posição do objeto, teste de intersecção p/ pegar objeto, atualiza matriz model
         UpdateInteractiveObject(window, "bunny", model_bunny, select_point);
@@ -928,18 +917,8 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model_bunny));
         glUniform1i(object_id_uniform, BUNNY);
         DrawVirtualObject("bunny");
-
-        // Atualiza a posição do objeto, teste de intersecção p/ pegar objeto, atualiza matriz model
-        UpdateInteractiveObject(window, "box", model_box, select_point);
-
-        // Box
-        //model = Matrix_Translate(3.5f,0.0f,0.9f) * Matrix_Scale(0.2f,0.2f,0.2f);
-        RederingObj(&boxmodel, model_box, DEFAULT);
         */
 
-        // Imprimimos na tela os ângulos de Euler que controlam a rotação do
-        // terceiro cubo.
-        TextRendering_ShowEulerAngles(window);
 
         // Imprimimos na tela informação sobre o número de quadros renderizados
         // por segundo (frames per second).
@@ -1865,21 +1844,6 @@ void TextRendering_ShowModelViewProjection(
 
     TextRendering_PrintString(window, " Viewport matrix           NDC      In Pixel Coords.", -1.0f, 1.0f-25*pad, 1.0f);
     TextRendering_PrintMatrixVectorProductMoreDigits(window, viewport_mapping, p_ndc, -1.0f, 1.0f-26*pad, 1.0f);
-}
-
-// Escrevemos na tela os ângulos de Euler definidos nas variáveis globais
-// g_AngleX, g_AngleY, e g_AngleZ.
-void TextRendering_ShowEulerAngles(GLFWwindow* window)
-{
-    if ( !g_ShowInfoText )
-        return;
-
-    float pad = TextRendering_LineHeight(window);
-
-    char buffer[80];
-    snprintf(buffer, 80, "Euler Angles rotation matrix = Z(%.2f)*Y(%.2f)*X(%.2f)\n", g_AngleZ, g_AngleY, g_AngleX);
-
-    TextRendering_PrintString(window, buffer, -1.0f+pad/10, -1.0f+2*pad/10, 1.0f);
 }
 
 // Escrevemos na tela o número de quadros renderizados por segundo (frames per

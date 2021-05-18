@@ -29,6 +29,7 @@ uniform bool is_flashlight_on;
 #define LIGTHSWITCH  4
 #define BOX 5
 #define BOXNORMAL 6
+#define COW 7
 
 uniform int object_id;
 
@@ -196,7 +197,7 @@ void main()
         V = (position_model.y - miny)/(maxy - miny);
 
         Kd = texture(TextureImage0, vec2(U,V)).rgb; */
-        Kd = vec3(0.8,0.4,0.08);
+        Kd = vec3(0.8,0.8,0.0);
         // Propriedades espectrais do coelho
         //Kd = vec3(0.08,0.4,0.8);
         Ks = vec3(0.8,0.8,0.8);
@@ -255,7 +256,7 @@ void main()
         hasKD0 = true;
         Kd0 = texture(TextureImage2, vec2(U,V)).rgb;
 
-        
+
 
 
         // Propriedades espectrais do plano
@@ -284,6 +285,13 @@ void main()
         Ks = Ksu;
         q = 1.0;
 
+    }
+    else if(object_id == COW){
+        Kd = vec3(0.0,0.8,0.1);
+        Ks = vec3(0.3,0.3,0.3);
+        Ka = vec3(0.04,0.04,0.04);
+        //q = 32.0; //phong
+        q = 80; //blinn-phong
     }
     else // Objeto desconhecido = preto
     {

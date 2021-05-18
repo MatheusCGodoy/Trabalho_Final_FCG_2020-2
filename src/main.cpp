@@ -325,14 +325,14 @@ int main(int argc, char* argv[])
     ComputeNormals(&boxmodel);
     BuildTrianglesAndAddToVirtualScene(&boxmodel);
 
-        ObjModel displaymodel("../../data/display.obj");
+    ObjModel displaymodel("../../data/display.obj");
     ComputeNormals(&displaymodel);
     BuildTrianglesAndAddToVirtualScene(&displaymodel);
 
-    //ObjModel light_switchmodel("../../data/light_switch.obj");
-    //ComputeNormals(&light_switchmodel);
-    //BuildTrianglesAndAddToVirtualScene(&light_switchmodel);
-
+    ObjModel light_switchmodel("../../data/light_switch.obj");
+    ComputeNormals(&light_switchmodel);
+    BuildTrianglesAndAddToVirtualScene(&light_switchmodel);
+ 
     ObjModel cow("../../data/cow.obj");
     ComputeNormals(&cow);
     BuildTrianglesAndAddToVirtualScene(&cow);
@@ -763,6 +763,9 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, WALL);
         DrawVirtualObject("wall");
 
+         //Lightswitch         
+        model = Matrix_Translate(2.9f,0.7f,4.95f)* Matrix_Rotate_X(3.14) * Matrix_Scale(0.2f,0.2f,0.2f);
+        RederingObj(&light_switchmodel, model, DEFAULT);
 
         // Lightbulb
         model = Matrix_Translate(2.0f,1.8f,2.0f) * Matrix_Scale(0.15f, 0.15f, 0.15f);
@@ -789,13 +792,7 @@ int main(int argc, char* argv[])
         // Ponto de seleção - usado para pegar os objetos - teste de intersecção
         select_point = camera_position_c + (camera_view_vector*0.2f);
 
-        if (select_point.x == 1.0,select_point.y == 1.0, select_point.z == 3.0){
-            printf("asdwad");
-        }
-
-        // Lightswitch
-/*         model = Matrix_Translate(1.0f,1.0f,3.0f) * Matrix_Rotate_Y(3.15) * Matrix_Translate(-1.0f,0.0f,-1.95f) * Matrix_Scale(0.03f,0.03f,0.03f);
-        RederingObj(&light_switchmodel, model, LIGTHSWITCH); */
+       
 
         // Testa se está segurando o coelho
         if(g_VirtualScene["bunny"].picked_up && glfwGetKey(window, GLFW_KEY_E)){

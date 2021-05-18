@@ -232,7 +232,7 @@ void main()
         Ka = Kau;
         Kd = Kdu;
         Ks = Ksu;
-        q = 1.0;
+        q = 90.0;
     }
     else if ( object_id == LIGTHSWITCH ) {
         // Coordenadas de textura do plano, obtidas do arquivo OBJ.
@@ -264,7 +264,7 @@ void main()
         Ka = Kau;
         Kd = Kdu;
         Ks = Ksu;
-        q = 1.0;
+        q = 50.0;
 
         if(is_flashlight_on && !not_under_light){
             Kd = vec3(0.0,0.2,0.0);;
